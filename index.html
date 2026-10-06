@@ -30,6 +30,7 @@
     html { scroll-behavior: smooth; scroll-padding-top: 90px; overflow-x: clip; }
     body { margin: 0; color: var(--ink); background: var(--pale); font-family: var(--body); overflow-x: hidden; }
     body.menu-open { overflow: hidden; }
+    body.menu-open .site-header .brand, body.menu-open .site-header .nav-tools { visibility: hidden; }
     img { display: block; max-width: 100%; }
     a { color: inherit; text-decoration: none; }
     button, input, select { font: inherit; }
@@ -38,7 +39,9 @@
     h1, h2, h3 { font-family: var(--display); font-weight: 700; letter-spacing: -.025em; }
     p, a, h1, h2, h3, small, button { overflow-wrap: break-word; }
     .wrap { width: min(930px, calc(100% - 48px)); margin-inline: auto; }
-    .site-header { position: absolute; inset: 0 0 auto; z-index: 30; }
+    .site-header { position: absolute; inset: 0 0 auto; z-index: 30; transition: transform .35s ease, opacity .35s ease; }
+    .site-header.is-scrolled { position: fixed; top: 0; left: 0; right: 0; background: #f7f9ffee; backdrop-filter: blur(18px); box-shadow: 0 8px 24px #26396b10; }
+    .site-header.is-hidden { transform: translateY(-115%); opacity: 0; }
     .nav { height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
     .brand { display: inline-flex; align-items: center; gap: 8px; flex: none; font: 700 27px/1 var(--display); letter-spacing: -.04em; }
     .brand-icon { width: 26px; height: 29px; display: inline-grid; place-items: center; color: var(--blue); }
@@ -46,15 +49,11 @@
     .nav-links a { transition: color .2s; }
     .nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--blue-deep); }
     .nav-tools { display: flex; align-items: center; gap: 10px; }
-    .search-button { border: 0; width: 38px; height: 38px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; }
     .button { min-height: 42px; padding: 12px 22px; border: 0; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; color: #fff; background: var(--blue); box-shadow: 0 8px 20px #6682f444; font-size: 12px; font-weight: 900; transition: transform .2s, background .2s, box-shadow .2s; }
     .button:hover { transform: translateY(-2px); background: var(--blue-deep); box-shadow: 0 12px 24px #6682f455; }
     .button-light { color: var(--ink); background: #fff; box-shadow: 0 6px 20px #29366412; }
     .button-light:hover { color: var(--blue-deep); background: #fff; }
     .menu-button { display: none; padding: 8px; border: 0; background: transparent; color: var(--ink); }
-    .search-panel { position: absolute; top: 70px; right: max(24px, calc((100vw - 930px) / 2)); display: none; align-items: center; gap: 9px; width: min(310px, calc(100vw - 48px)); padding: 9px 12px; border: 1px solid #e5e9f6; border-radius: 15px; background: #fff; box-shadow: 0 14px 35px #29366418; }
-    .search-panel.open { display: flex; }
-    .search-panel input { min-width: 0; width: 100%; border: 0; outline: 0; color: var(--ink); }
     .hero-shell { position: relative; overflow: hidden; min-height: 715px; padding: 168px 0 54px; background: linear-gradient(112deg, #f4f6ff 0%, #edf5ff 42%, #a6ebef 100%); }
     .hero-shell:before { content: ''; position: absolute; width: 410px; height: 140px; right: -68px; bottom: 0; border-radius: 100% 0 0 0; background: var(--blue); opacity: .95; }
     .hero-shell:after { content: ''; position: absolute; right: 11%; top: 118px; width: 9px; height: 9px; border: 2px solid #91b4f0; border-radius: 50%; box-shadow: 27px -16px 0 -2px #b6c7fb, 48px 7px 0 -1px #b3c2f8, -18px 33px 0 -1px #a1b7f5; opacity: .85; }
@@ -69,21 +68,21 @@
     .play-button { width: 45px; height: 45px; display: grid; place-items: center; border: 3px solid #ffd23b; border-radius: 50%; background: #ffbd16; color: #fff; box-shadow: 0 0 0 4px #ffcf5850; }
     .play-label { color: #726e81; font-size: 12px; font-weight: 800; }
     .client-proof { display: flex; align-items: center; gap: 13px; margin-top: 34px; font-size: 12px; font-weight: 900; }
-    .client-faces { display: flex; align-items: center; padding-left: 3px; }
-    .client-faces span { width: 33px; height: 33px; margin-left: -4px; border: 2px solid #f3f8ff; border-radius: 50%; display: grid; place-items: center; background: #fff; color: var(--blue-deep); font-size: 8px; font-weight: 900; }
-    .client-faces img { position: relative; width: 36px; height: 36px; margin-left: -7px; border: 2px solid #f3f8ff; border-radius: 50%; object-fit: cover; background: #fff; }
-    .client-faces img:first-child { margin-left: -4px; }
-    .client-faces span:nth-child(2) { background: #c8f4f5; }
-    .client-faces span:nth-child(3) { background: #ffdbb5; }
-    .client-faces span:nth-child(4) { background: #d7d1ff; }
+    .client-faces { display: flex; align-items: center; gap: 5px; width: min(52vw, 218px); overflow-x: auto; padding: 2px 1px 5px; scrollbar-width: none; cursor: grab; touch-action: pan-x; }
+    .client-faces::-webkit-scrollbar { display:none; }
+    .client-faces.dragging { cursor: grabbing; user-select:none; }
+    .client-faces span { width: 37px; height: 37px; flex: none; border: 2px solid #f3f8ff; border-radius: 50%; display: grid; place-items: center; background: #fff; color: var(--blue-deep); font-size: 8px; font-weight: 900; }
+    .client-faces img { position: relative; width: 36px; height: 36px; flex: none; border: 2px solid #f3f8ff; border-radius: 50%; object-fit: cover; background: #fff; }
     .client-faces span:last-child { width: 37px; height: 37px; background: var(--blue); color: #fff; font-size: 9px; }
+    .client-faces span[aria-label] { background: var(--blue); color: #fff; }
     .hero-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(100%, 380px); gap: 10px; margin-top: 21px; }
-    .hero-stat { min-width: 0; padding: 10px 12px; border-radius: 15px; display: flex; align-items: center; gap: 9px; background: #fff; box-shadow: 0 12px 35px #3b5cae10; }
+    .hero-stat { min-width: 0; padding: 10px 12px; border-radius: 15px; display: flex; align-items: flex-start; flex-direction: column; gap: 5px; background: #fff; box-shadow: 0 12px 35px #3b5cae10; }
     .hero-stat strong { display: inline-block; flex: none; min-width: 4.1ch; color: var(--blue); font: 700 25px/1 var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .hero-stat span { flex: 1; min-width: 0; max-width: none; font-size: 10px; font-weight: 900; line-height: 1.2; white-space: nowrap; }
+    .hero-stat span { flex: 1; min-width: 0; max-width: none; font-size: 10px; font-weight: 900; line-height: 1.25; white-space: normal; text-wrap: balance; }
     .hero-art { position: relative; align-self: stretch; display: grid; place-items: center; min-width: 0; margin: -10px -47px -46px -28px; }
     .hero-art:before { content: ''; position: absolute; width: min(95%, 525px); aspect-ratio: 1; top: 12%; right: -1%; border-radius: 50%; background: radial-gradient(circle, #baf6f5a6 0 33%, #ffffff00 70%); }
-    .hero-kit { position: relative; z-index: 1; width: min(125%, 615px); max-height: 590px; object-fit: contain; filter: drop-shadow(0 28px 25px #274ab348); }
+    .hero-kit { position: absolute; z-index: 1; width: min(125%, 615px); max-height: 590px; object-fit: contain; filter: drop-shadow(0 28px 25px #274ab348); opacity: 0; transition: opacity .9s ease; }
+    .hero-kit.is-current { opacity: 1; }
     .bubble { position: absolute; z-index: 2; border: 2px solid #a6baf2a1; border-radius: 50%; }
     .bubble-one { width: 14px; height: 14px; left: 1%; top: 26%; }
     .bubble-two { width: 8px; height: 8px; left: 5%; top: 32%; background: #9ab2f2; border: 0; }
@@ -122,8 +121,9 @@
     .carousel-controls { display: flex; gap: 10px; flex: none; }
     .carousel-arrow { width: 56px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 999px; background: #fff; color: var(--blue-deep); transition: background .2s, color .2s; }
     .carousel-arrow:hover { background: var(--blue); color: #fff; }
-    .services-list { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+    .services-list { position: relative; z-index: 1; display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 44px) / 3); grid-template-columns: none; gap: 22px; overflow-x: auto; padding: 2px 3px 15px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
     .service-card { min-width: 0; overflow: hidden; padding: 12px; border-radius: 22px; box-shadow: 0 15px 35px #415b9d12; }
+    .service-card { scroll-snap-align: start; }
     .service-image { position: relative; overflow: hidden; height: 226px; border-radius: 17px; background: #d9e8f6; }
     .service-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
     .service-card:hover .service-image img { transform: scale(1.04); }
@@ -132,9 +132,9 @@
     .service-meta h3 { margin: 0; color: #4868c7; font-size: 17px; letter-spacing: 0; }
     .service-link { width: 39px; height: 39px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: #fff; }
     .service-card:nth-child(2) .service-link { background: #fff; color: var(--ink); }
-    .carousel-dots { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 28px; }
-    .carousel-dots span { width: 6px; height: 6px; border-radius: 50%; background: #92a9ec; }
-    .carousel-dots span:first-child { width: 10px; height: 10px; border: 2px solid #6f8de7; background: transparent; }
+    .carousel-dots { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 20px; }
+    .carousel-dots button { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 50%; background: #92a9ec; transition: width .2s, background .2s; }
+    .carousel-dots button[aria-current="true"] { width: 20px; border-radius: 99px; background: #4166db; }
     .choose-grid { gap: 60px; }
     .choose-copy .section-heading { max-width: 460px; }
     .check-list { display: grid; gap: 10px; margin: 22px 0 22px; padding: 0; list-style: none; }
@@ -275,7 +275,7 @@
       .services-section, .price-section { padding: 74px 0; }
       .section-topline { align-items: start; }
       .section-topline .section-heading { max-width: 440px; }
-      .services-list { display: flex; gap: 14px; overflow-x: auto; padding: 2px 2px 15px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+      .services-list { grid-auto-columns: min(82%, 340px); display: grid; grid-auto-flow: column; grid-template-columns: none; gap: 14px; overflow-x: auto; padding: 2px 2px 15px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
       .service-card { flex: 0 0 min(82%, 340px); scroll-snap-align: start; }
       .service-image { height: 210px; }
       .choose-visual { min-height: min(92vw, 430px); }
@@ -296,10 +296,11 @@
     @media (max-width: 420px) {
       .nav { gap: 8px; }
       .nav-tools { gap: 6px; }
-      .search-button { width: 34px; height: 34px; }
       .nav-tools > .button { min-height: 38px; padding: 9px 11px; font-size: 10px; }
       .menu-button { padding: 5px; }
-      .nav-links { padding-inline: 15px; border-radius: 23px 0 0 23px; }
+      .nav-links { width: 50vw; padding-inline: 15px; border-radius: 23px 0 0 23px; }
+      .client-faces { width: min(44vw, 170px); }
+      .client-proof { gap: 10px; }
       .menu-close { margin-bottom: 22px; }
       .hero-ctas { gap: 12px; }
       .hero-stats { gap: 8px; }
@@ -324,6 +325,38 @@
       .reveal { opacity: 1; transform: none; }
       .nav-links, .nav-backdrop { transition-duration: .01ms !important; }
     }
+
+    .client-faces img,.client-faces span { animation: avatar-arrive .42s both; }
+    .client-faces > :nth-child(2) { animation-delay:.05s }.client-faces > :nth-child(3) { animation-delay:.1s }.client-faces > :nth-child(4) { animation-delay:.15s }.client-faces > :nth-child(5) { animation-delay:.2s }.client-faces > :nth-child(n+6) { animation-delay:.28s }
+    @keyframes avatar-arrive { from { opacity:.25; transform:translateX(9px) scale(.9) } to { opacity:1; transform:translateX(0) scale(1) } }
+    .dialog { width:min(540px,calc(100% - 28px)); max-height:min(88vh,850px); padding:0; border:1px solid #ffffffcf; border-radius:25px; background:linear-gradient(145deg,#fafdff,#e9f4ff); color:var(--ink); box-shadow:0 28px 90px #10173366; }
+    .dialog::backdrop { background:#10173394; backdrop-filter:blur(8px); }
+    .dialog[open] { animation:dialog-in .24s ease-out both; }
+    @keyframes dialog-in { from {opacity:0;transform:translateY(12px) scale(.985)} to {opacity:1;transform:translateY(0) scale(1)} }
+    .dialog-head { display:flex; align-items:center; justify-content:space-between; gap:15px; padding:19px 23px; border-bottom:1px solid #dce6f5; }
+    .dialog-head h2 { margin:4px 0 0; font-size:23px; }
+    .dialog-close { width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:var(--ink);font-size:23px;line-height:1; }
+    .dialog-content { padding:22px 24px 25px; overflow:auto; max-height:calc(88vh - 78px); }
+    .booking-intro { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:19px; flex-wrap:wrap; }
+    .booking-intro strong { font:700 21px/1.1 var(--display); color:var(--blue-deep); }
+    .booking-intro span { font-size:11px;color:var(--muted); }
+    .booking-intro a { color:var(--deep);font-weight:900;white-space:nowrap; }
+    #bookingForm { display:grid; gap:13px; }
+    #bookingForm label { display:grid; gap:6px; color:#525d75;font-size:12px;font-weight:900; }
+    #bookingForm input,#bookingForm select { width:100%;min-height:44px;padding:10px 13px;border:1px solid #d4deef;border-radius:12px;background:#ffffffdc;color:var(--ink);outline:none; }
+    #bookingForm input:focus,#bookingForm select:focus { border-color:var(--blue);box-shadow:0 0 0 3px #6682f426; }
+    .booking-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+    .privacy-note { margin:0;color:var(--muted);font-size:11px;line-height:1.5; }
+    .booking-submit { width:100%; }
+    .booking-submit:disabled { opacity:.65;cursor:wait; }
+    .form-status { min-height:1em;margin:0;color:var(--deep);font-size:12px;font-weight:800;line-height:1.5; }
+    .promo-dialog { width:80vw;height:80vh;max-width:80vw;max-height:80vh; }
+    .promo-frame { height:calc(80vh - 78px);padding:16px 21px 19px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:11px; }
+    .promo-frame > p { margin:0;color:var(--muted);font-size:12px; }
+    .promo-frame video { display:block;width:100%;height:100%;min-height:0;object-fit:contain;border-radius:16px;background:#dce8f6; }
+    .promo-controls { display:flex;justify-content:center;gap:10px;flex-wrap:wrap; }
+    @media(max-width:600px) { .booking-row { grid-template-columns:1fr; }.booking-intro { align-items:flex-start;flex-direction:column; }.promo-dialog { width:80vw;height:80vh;max-width:80vw;max-height:80vh; }.promo-frame { height:calc(80vh - 78px);padding:13px; } }
+    @media(prefers-reduced-motion:reduce){.client-faces img,.client-faces span{animation:none}}
   </style>
 </head>
 <body>
@@ -333,13 +366,11 @@
         <svg class="brand-icon" viewBox="0 0 28 32" fill="none" aria-hidden="true"><path d="M10 2.5a1.7 1.7 0 1 1 0 3.4 1.7 1.7 0 0 1 0-3.4ZM18 5.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" fill="currentColor"/><path d="M4.5 9h18v18.2c0 1.1-.9 2-2 2h-14c-1.1 0-2-.9-2-2V9Z" fill="currentColor"/><path d="M9 14.5v5.2M18 14.5v5.2M8 23c3.6 2.4 7.4 2.4 11 0" stroke="#211c37" stroke-width="1.6" stroke-linecap="round"/></svg>
         <span>Clino</span>
       </a>
-      <div class="nav-links" id="navLinks"><button class="menu-close" id="menuClose" type="button" aria-label="Close menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg></button><a href="#home" aria-current="page">Home</a><a href="#about">About Us</a><a href="#services">Services</a><a href="#services">Testimonial</a><a href="#plans">Blog</a></div>
+      <div class="nav-links" id="navLinks"><button class="menu-close" id="menuClose" type="button" aria-label="Close menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg></button><a href="#home" aria-current="page">Home</a><a href="about.html">About Us</a><a href="services.html">Services</a><a href="testimonials.html">Testimonials</a><a href="blog.html">Blog</a><a href="tel:+15612754445">Contact</a></div>
       <div class="nav-tools">
-        <button class="search-button" id="searchButton" aria-label="Search services" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></button>
-        <a class="button" href="#contact">Contact Us</a>
+        <a class="button" href="tel:+15612754445">Call Us</a>
         <button class="menu-button" id="menuButton" type="button" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       </div>
-      <form class="search-panel" id="searchPanel" role="search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="searchInput" type="search" placeholder="Find a cleaning service" aria-label="Find a cleaning service"></form>
     </nav>
     <button class="nav-backdrop" id="navBackdrop" type="button" aria-label="Close menu" tabindex="-1" hidden></button>
   </header>
@@ -350,11 +381,11 @@
           <span class="tag">We Are Clino</span>
           <h1 class="hero-title">Feel your way<br>for freshness</h1>
           <p>Experience the epitome of cleanliness with Clino. We provide top-notch cleaning services tailored to your needs, ensuring your spaces shine with perfection.</p>
-          <div class="hero-ctas"><a class="button button-services" href="#services">Our Services <span class="round-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m15 3 6 6M4 20l3.5-.7L19 7l-2-2L5.5 16.5 4 20Z"/><path d="m8 17 2 2"/></svg></span></a><a class="play-button" href="#why" aria-label="Learn how Clino works"><svg width="13" height="15" viewBox="0 0 12 14" fill="currentColor" aria-hidden="true"><path d="M11 7 1 13V1l10 6Z"/></svg></a><span class="play-label">How it works</span></div>
-          <div class="client-proof"><div class="client-faces" aria-label="Clino clients"><img src="assets/clino-client-amara.webp" alt="" width="36" height="36"><img src="assets/clino-client-raj.webp" alt="" width="36" height="36"><img src="assets/clino-client-lucia.webp" alt="" width="36" height="36"><img src="assets/clino-client-owen.webp" alt="" width="36" height="36"><span aria-label="65 more clients">+65</span></div><span>Our VIP Clients</span></div>
+          <div class="hero-ctas"><a class="button button-services" href="#services">Our Services <span class="round-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m15 3 6 6M4 20l3.5-.7L19 7l-2-2L5.5 16.5 4 20Z"/><path d="m8 17 2 2"/></svg></span></a><button class="play-button" id="openPromo" type="button" aria-label="Watch how Clino works"><svg width="13" height="15" viewBox="0 0 12 14" fill="currentColor" aria-hidden="true"><path d="M11 7 1 13V1l10 6Z"/></svg></button><span class="play-label">How it works</span></div>
+          <div class="client-proof"><div class="client-faces" aria-label="Client portraits and more clients"><img src="assets/clino-client-amara.webp" alt="" width="36" height="36"><img src="assets/clino-client-raj.webp" alt="" width="36" height="36"><img src="assets/clino-client-lucia.webp" alt="" width="36" height="36"><img src="assets/clino-client-owen.webp" alt="" width="36" height="36"><span aria-label="10 more clients">+10</span><img src="assets/clino-client-james.webp" alt="" width="36" height="36"><img src="assets/clino-client-danielle.webp" alt="" width="36" height="36"><img src="assets/clino-client-carlos.webp" alt="" width="36" height="36"><img src="assets/clino-client-elaine.webp" alt="" width="36" height="36"></div><span>Our VIP Clients</span></div>
           <div class="hero-stats"><div class="hero-stat glass-card"><strong data-count="800" data-suffix="+">800+</strong><span>Happy Clients</span></div><div class="hero-stat glass-card"><strong data-count="180" data-suffix="+">180+</strong><span>Awards Received</span></div></div>
         </div>
-        <div class="hero-art"><span class="bubble bubble-one"></span><span class="bubble bubble-two"></span><img class="hero-kit" src="assets/clino-kit.webp" alt="Bright blue bucket filled with colorful cleaning supplies"></div>
+        <div class="hero-art"><span class="bubble bubble-one"></span><span class="bubble bubble-two"></span><img class="hero-kit is-current" data-hero-slide="0" src="assets/clino-yacht-deck.webp" alt="Clino team carefully cleaning a yacht deck" fetchpriority="high"><img class="hero-kit" data-hero-slide="1" src="assets/clino-yacht-interior.webp" alt="Clino team polishing a yacht interior" aria-hidden="true" loading="lazy"></div>
       </div>
     </section>
     <div class="feature-row wrap" aria-label="Why customers choose Clino">
@@ -371,10 +402,18 @@
     <section class="services-section section" id="services">
       <div class="wrap"><div class="section-topline"><div><span class="tag">Our Services</span><h2 class="section-heading">Elevate your space<br>with our service</h2></div><div class="carousel-controls"><button class="carousel-arrow" id="servicePrev" aria-label="Previous services"><svg width="20" height="16" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 8H3m0 0 6-6M3 8l6 6"/></svg></button><button class="carousel-arrow" id="serviceNext" aria-label="Next services"><svg width="20" height="16" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8h19m0 0-6-6m6 6-6 6"/></svg></button></div></div>
         <div class="services-list" id="servicesList">
-          <article class="service-card glass-card reveal" data-search="home cleaning house home residential"><div class="service-image"><img src="assets/clino-floor.webp" alt="Mopping a spotless home floor" loading="lazy"><span class="rating">4.7 ★</span></div><div class="service-meta"><h3>Home Cleaning</h3><a class="service-link" href="#plans" aria-label="View home cleaning plans"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
-          <article class="service-card glass-card reveal" data-search="kitchen cleaning kitchen home"><div class="service-image"><img src="assets/clino-team.webp" alt="Cleaning team preparing a kitchen for service" loading="lazy"><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Kitchen Cleaning</h3><a class="service-link" href="#plans" aria-label="View kitchen cleaning plans"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
-          <article class="service-card glass-card reveal" data-search="office cleaning office workplace commercial"><div class="service-image"><img src="assets/clino-office.webp" alt="Professional cleaning in a modern office" loading="lazy"><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Office Cleaning</h3><a class="service-link" href="#plans" aria-label="View office cleaning plans"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
-        </div><div class="carousel-dots" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <article class="service-card glass-card reveal" data-search="home cleaning cleaning home yacht marine"><div class="service-image"><img src="assets/clino-floor.webp" alt="A complete clean for fresh, comfortable home routines." loading="lazy"><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Home Cleaning</h3><a class="service-link" href="tel:+15612754445" aria-label="Call about Home Cleaning"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="kitchen cleaning cleaning home yacht marine"><div class="service-image"><img src="assets/clino-glass.webp" alt="A brighter, tidier heart of the home, cared for in detail." loading="lazy"><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Kitchen Cleaning</h3><a class="service-link" href="tel:+15612754445" aria-label="Call about Kitchen Cleaning"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="office cleaning cleaning home yacht marine"><div class="service-image"><img src="assets/clino-office.webp" alt="A fresh and welcoming space for your team and clients." loading="lazy"><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Office Cleaning</h3><a class="service-link" href="tel:+15612754445" aria-label="Call about Office Cleaning"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="yacht deck & teak cleaning home yacht marine"><div class="service-image"><img src="assets/clino-yacht-deck.webp" alt="Detail-minded care for decks, teak and outdoor surfaces." loading="lazy"><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Yacht Deck & Teak</h3><a class="service-link" href="tel:+15612754445" aria-label="Call about Yacht Deck & Teak"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="yacht cabin interior cleaning home yacht marine"><div class="service-image"><img src="assets/clino-yacht-interior.webp" alt="A careful refresh for comfortable onboard living." loading="lazy"><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Yacht Cabin Interior</h3><a class="service-link" href="tel:+15612754445" aria-label="Call about Yacht Cabin Interior"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="marine glass cleaning home yacht marine"><div class="service-image"><img src="assets/clino-yacht-glass.webp" alt="Clearer windows and brighter marina and ocean views." loading="lazy"><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Marine Glass</h3><a class="service-link" href="tel:+15612754445" aria-label="Call about Marine Glass"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="stainless detailing cleaning home yacht marine"><div class="service-image"><img src="assets/clino-yacht-steel.webp" alt="Fresh, polished high-touch stainless surfaces." loading="lazy"><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Stainless Detailing</h3><a class="service-link" href="tel:+15612754445" aria-label="Call about Stainless Detailing"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="cabin refresh cleaning home yacht marine"><div class="service-image"><img src="assets/clino-yacht-cabin.webp" alt="Fresh bedding and thoughtful details between trips." loading="lazy"><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Cabin Refresh</h3><a class="service-link" href="tel:+15612754445" aria-label="Call about Cabin Refresh"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="yacht exterior wash cleaning home yacht marine"><div class="service-image"><img src="assets/clino-yacht-hull.webp" alt="Professional exterior washing planned for your vessel." loading="lazy"><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Yacht Exterior Wash</h3><a class="service-link" href="tel:+15612754445" aria-label="Call about Yacht Exterior Wash"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="carpet & upholstery cleaning home yacht marine"><div class="service-image"><img src="assets/clino-yacht-carpet.webp" alt="Careful vacuuming for your onboard soft surfaces." loading="lazy"><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Carpet & Upholstery</h3><a class="service-link" href="tel:+15612754445" aria-label="Call about Carpet & Upholstery"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="cockpit detailing cleaning home yacht marine"><div class="service-image"><img src="assets/clino-yacht-cockpit.webp" alt="A considered clean for cockpit seating and entertaining." loading="lazy"><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Cockpit Detailing</h3><a class="service-link" href="tel:+15612754445" aria-label="Call about Cockpit Detailing"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+        </div><div class="carousel-dots" id="serviceDots" aria-label="Choose a service slide"></div>
       </div>
     </section>
     <section class="section" id="why">
@@ -386,23 +425,25 @@
     <section class="price-section section" id="plans">
       <div class="wrap"><div class="price-intro"><div><span class="tag">Price Package</span><h2 class="section-heading">Choose Your Perfect<br>Clean</h2></div><p>Explore our range of meticulously curated cleaning packages designed to meet your unique needs.</p></div>
         <div class="plans">
-          <article class="plan glass-card reveal"><h3>Basic Plan</h3><div class="plan-price"><span>$</span><strong>30</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>Cleaning bathrooms</li><li><span class="check-icon">✓</span>Mopping floors</li><li><span class="check-icon">✓</span>Vacuuming carpets and rugs</li><li><span class="check-icon">✓</span>Dusting and wiping surfaces</li></ul><a class="button" href="#contact">Buy Plan</a></article>
-          <article class="plan glass-card reveal"><h3>Standard Plan</h3><div class="plan-price"><span>$</span><strong>70</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>All services from the basic</li><li><span class="check-icon">✓</span>Washing baseboards, molding</li><li><span class="check-icon">✓</span>Cleaning inside cabinets</li><li><span class="check-icon">✓</span>Cleaning inside drawers</li></ul><a class="button" href="#contact">Buy Plan</a></article>
-          <article class="plan glass-card reveal"><h3>Premium Plan</h3><div class="plan-price"><span>$</span><strong>120</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>All services from standard</li><li><span class="check-icon">✓</span>Cleaning inside closets</li><li><span class="check-icon">✓</span>Emptying trash bins</li><li><span class="check-icon">✓</span>High-touch surfaces</li></ul><a class="button" href="#contact">Buy Plan</a></article>
+          <article class="plan glass-card reveal"><h3>Basic Plan</h3><div class="plan-price"><span>$</span><strong>30</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>Cleaning bathrooms</li><li><span class="check-icon">✓</span>Mopping floors</li><li><span class="check-icon">✓</span>Vacuuming carpets and rugs</li><li><span class="check-icon">✓</span>Dusting and wiping surfaces</li></ul><button class="button" type="button" data-book-plan="Basic Plan">Book Plan</button></article>
+          <article class="plan glass-card reveal"><h3>Standard Plan</h3><div class="plan-price"><span>$</span><strong>70</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>All services from the basic</li><li><span class="check-icon">✓</span>Washing baseboards, molding</li><li><span class="check-icon">✓</span>Cleaning inside cabinets</li><li><span class="check-icon">✓</span>Cleaning inside drawers</li></ul><button class="button" type="button" data-book-plan="Standard Plan">Book Plan</button></article>
+          <article class="plan glass-card reveal"><h3>Premium Plan</h3><div class="plan-price"><span>$</span><strong>120</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>All services from standard</li><li><span class="check-icon">✓</span>Cleaning inside closets</li><li><span class="check-icon">✓</span>Emptying trash bins</li><li><span class="check-icon">✓</span>High-touch surfaces</li></ul><button class="button" type="button" data-book-plan="Premium Plan">Book Plan</button></article>
         </div>
       </div>
     </section>
     <div class="collage" aria-label="Clino cleaning in homes and workplaces"><img src="assets/clino-glass.webp" alt="Polishing a window" loading="lazy"><img src="assets/clino-floor.webp" alt="Mopping a home floor" loading="lazy"><img src="assets/clino-glass.webp" alt="Wiping a glass surface" loading="lazy"><img src="assets/clino-team.webp" alt="Cleaning team at work" loading="lazy"><img src="assets/clino-glass.webp" alt="Cleaning a bright room" loading="lazy"><img src="assets/clino-office.webp" alt="Vacuuming an office" loading="lazy"></div>
-    <section class="quote-section" id="contact"><div class="wrap"><div class="quote-band reveal"><div><h2>Call For A Free Quote</h2><p>Tell us about your space and we’ll help find the right clean.</p></div><div class="quote-contact"><span class="phone-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.6 3.5 9 3l2 4.6-2 1.6a14 14 0 0 0 5.8 5.8l1.6-2 4.6 2-.5 2.4a3 3 0 0 1-3.2 2.4A16 16 0 0 1 4.2 6.7a3 3 0 0 1 2.4-3.2Z"/></svg></span><div><small>Get in touch</small><a href="mailto:contact@clino.example">Request an estimate</a></div></div></div><div class="partners" aria-label="Cleaning service partners"><span>Maingner</span><span>BROG</span><span>VONICA</span><span>katerio</span><span>FOXER</span></div></div></section>
+    <section class="quote-section" id="contact"><div class="wrap"><div class="quote-band reveal"><div><h2>Call For A Free Quote</h2><p>Tell us about your space and we’ll help find the right clean.</p></div><div class="quote-contact"><span class="phone-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.6 3.5 9 3l2 4.6-2 1.6a14 14 0 0 0 5.8 5.8l1.6-2 4.6 2-.5 2.4a3 3 0 0 1-3.2 2.4A16 16 0 0 1 4.2 6.7a3 3 0 0 1 2.4-3.2Z"/></svg></span><div><small>Get in touch</small><a href="tel:+15612754445">+1 (561) 275-4445</a></div></div></div><div class="partners" aria-label="Cleaning service partners"><span>Maingner</span><span>BROG</span><span>VONICA</span><span>katerio</span><span>FOXER</span></div></div></section>
   </main>
   <footer class="site-footer"><div class="wrap"><div class="footer-grid"><div class="footer-intro"><a class="brand footer-brand" href="#home"><svg class="brand-icon" viewBox="0 0 28 32" fill="none" aria-hidden="true"><path d="M10 2.5a1.7 1.7 0 1 1 0 3.4 1.7 1.7 0 0 1 0-3.4ZM18 5.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" fill="currentColor"/><path d="M4.5 9h18v18.2c0 1.1-.9 2-2 2h-14c-1.1 0-2-.9-2-2V9Z" fill="currentColor"/><path d="M9 14.5v5.2M18 14.5v5.2M8 23c3.6 2.4 7.4 2.4 11 0" stroke="#121b49" stroke-width="1.6" stroke-linecap="round"/></svg><span>Clino</span></a><p class="footer-description">Ready to experience the Clino difference? Contact us to plan a cleaning service or request a free estimate.</p><form class="newsletter" id="newsletterForm"><input type="email" required placeholder="Your email here" aria-label="Your email address"><button type="submit" aria-label="Submit your email"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m22 3-7 18-4-8-8-4 19-6ZM22 3 11 13"/></svg></button></form></div>
-      <div class="footer-col"><h3>Address</h3><a href="#contact">Contact Clino</a><a href="#contact">Request an estimate</a><a href="#about">About our team</a><div class="socials"><a href="#contact" aria-label="Facebook">f</a><a href="#contact" aria-label="Instagram">◎</a><a href="#contact" aria-label="Twitter">♥</a><a href="#contact" aria-label="Pinterest">p</a></div></div>
-      <div class="footer-col"><h3>Service Links</h3><a href="#services">Home Cleaning</a><a href="#services">Office Cleaning</a><a href="#services">Kitchen Cleaning</a><a href="#services">Deep Cleaning</a></div>
-      <div class="footer-col"><h3>Social</h3><a href="#contact">Facebook</a><a href="#contact">Instagram</a><a href="#contact">Twitter</a><a href="#contact">LinkedIn</a></div>
+      <div class="footer-col"><h3>Address</h3><a href="tel:+15612754445">Call +1 (561) 275-4445</a><a href="about.html">About our team</a><a href="testimonials.html">Client stories</a><div class="socials"><a href="https://www.facebook.com/" aria-label="Facebook">f</a><a href="https://www.instagram.com/" aria-label="Instagram"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg></a><a href="https://wa.me/15612754445" aria-label="WhatsApp"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.5 11.5a8.5 8.5 0 0 1-12.4 7.6L3 20l.9-4.5a8.5 8.5 0 1 1 16.6-4Z"/><path d="M8.5 8.2c.7 3.4 2.3 5 5.7 5.8l1.2-1.4 2 .9c-.2 1.8-1.4 2.6-2.7 2.4-3.8-.6-7.7-4.4-8.3-8.2-.2-1.4.7-2.5 2.4-2.7l.9 2-1.2 1.2Z"/></svg></a><a href="https://www.pinterest.com/" aria-label="Pinterest">p</a></div></div>
+      <div class="footer-col"><h3>Service Links</h3><a href="services.html">Home Cleaning</a><a href="services.html">Office Cleaning</a><a href="services.html#yacht">Yacht Cleaning</a><a href="services.html">All services</a></div>
+      <div class="footer-col"><h3>Social</h3><a href="blog.html">Clino Journal</a><a href="testimonials.html">Reviews</a><a href="about.html">Our Team</a><a href="services.html">Services</a></div>
     </div><div class="footer-bottom"><span>© 2026 Clino Cleaning Services. All rights reserved.</span><span>Clean spaces, cared for by Clino.</span></div></div></footer>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <dialog class="dialog booking-dialog" id="bookingDialog" aria-labelledby="bookingTitle"><div class="dialog-head"><div><span class="eyebrow">A brighter day starts here</span><h2 id="bookingTitle">Book a cleaning plan</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Close booking form">×</button></div><div class="dialog-content"><div class="booking-intro"><strong id="selectedPlan">Choose a plan</strong><span>Prefer to speak to us? <a href="tel:+15612754445">+1 (561) 275-4445</a></span></div><form id="bookingForm"><label>Full name<input name="name" type="text" minlength="2" maxlength="80" autocomplete="name" required></label><label>Email address<input name="email" type="email" maxlength="254" autocomplete="email" required></label><div class="booking-row"><label>Preferred date<input id="bookingDate" name="date" type="date" required></label><label>Preferred time<select name="time" required><option value="">Choose a time</option><option>08:00</option><option>09:00</option><option>10:00</option><option>11:00</option><option>12:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option></select></label></div><input type="hidden" name="plan"><p class="privacy-note">We’ll only use these details to follow up about your cleaning request.</p><button class="button booking-submit" type="submit">Request this booking</button><p class="form-status" id="bookingStatus" role="status" aria-live="polite"></p></form></div></dialog><dialog class="dialog promo-dialog" id="promoDialog" aria-labelledby="promoTitle"><div class="dialog-head"><div><span class="eyebrow">A little look at Clino</span><h2 id="promoTitle">Care in every detail</h2></div><button class="dialog-close" type="button" data-close-promo aria-label="Close video">×</button></div><div class="promo-frame"><p id="promoStatus" role="status" aria-live="polite">Your Clino film is being prepared…</p><video id="promoVideo" controls playsinline preload="none" aria-label="Clino cleaning services promotional video"></video><div class="promo-controls"><a class="button" href="services.html">Explore our services</a><a class="button outline" href="tel:+15612754445">Call Clino</a></div></div></dialog><div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script type="module" src="booking.js"></script>
+  <script type="module" src="promo.js"></script>
   <script>
     const menuButton = document.getElementById('menuButton');
     const menuClose = document.getElementById('menuClose');
@@ -422,6 +463,7 @@
       menuButton.setAttribute('aria-expanded', String(open));
       menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
       document.body.classList.toggle('menu-open', open);
+      if (open) document.querySelector('.site-header').classList.remove('is-hidden');
       if (open) menuClose.focus();
       else if (restoreFocus) menuButton.focus();
     }
@@ -432,31 +474,83 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') setMenuOpen(false);
     });
-    const searchButton = document.getElementById('searchButton');
-    const searchPanel = document.getElementById('searchPanel');
-    const searchInput = document.getElementById('searchInput');
-    searchButton.addEventListener('click', () => {
-      const open = searchPanel.classList.toggle('open');
-      searchButton.setAttribute('aria-expanded', String(open));
-      if (open) searchInput.focus();
-    });
-    searchPanel.addEventListener('submit', event => {
-      event.preventDefault();
-      const term = searchInput.value.trim().toLowerCase();
-      const cards = [...document.querySelectorAll('.service-card')];
-      let firstMatch = null;
-      cards.forEach(card => {
-        const match = !term || `${card.dataset.search} ${card.innerText}`.toLowerCase().includes(term);
-        card.hidden = !match;
-        if (match && !firstMatch) firstMatch = card;
+    let priorScrollY = window.scrollY;
+    let scrollTicking = false;
+    window.addEventListener('scroll', () => {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const header = document.querySelector('.site-header');
+        header.classList.toggle('is-scrolled', y > 60);
+        if (menuButton.getAttribute('aria-expanded') !== 'true') header.classList.toggle('is-hidden', y > priorScrollY && y > 140);
+        priorScrollY = Math.max(0, y);
+        scrollTicking = false;
       });
-      document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
-      if (term && !firstMatch) showToast('No matching service found. Try home, kitchen or office.');
-      else if (firstMatch) firstMatch.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-    });
+    }, { passive: true });
     const servicesList = document.getElementById('servicesList');
     document.getElementById('servicePrev').addEventListener('click', () => servicesList.scrollBy({ left: -servicesList.clientWidth * .82, behavior: 'smooth' }));
     document.getElementById('serviceNext').addEventListener('click', () => servicesList.scrollBy({ left: servicesList.clientWidth * .82, behavior: 'smooth' }));
+    const serviceCards = [...servicesList.querySelectorAll('.service-card')];
+    const serviceDots = document.getElementById('serviceDots');
+    const dotButtons = serviceCards.map((card, index) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.setAttribute('aria-label', `Show service ${index + 1} of ${serviceCards.length}: ${card.querySelector('h3').textContent}`);
+      dot.addEventListener('click', () => servicesList.scrollTo({ left: card.offsetLeft, behavior: 'smooth' }));
+      serviceDots.append(dot);
+      return dot;
+    });
+    function updateServiceDot() {
+      const currentLeft = servicesList.scrollLeft;
+      let nearest = 0;
+      serviceCards.forEach((card, index) => { if (Math.abs(card.offsetLeft - currentLeft) < Math.abs(serviceCards[nearest].offsetLeft - currentLeft)) nearest = index; });
+      dotButtons.forEach((dot, index) => { if (index === nearest) dot.setAttribute('aria-current', 'true'); else dot.removeAttribute('aria-current'); });
+    }
+    servicesList.addEventListener('scroll', updateServiceDot, { passive: true });
+    window.addEventListener('resize', updateServiceDot);
+    updateServiceDot();
+    const yachtHeroSlides = [
+      ['assets/clino-yacht-deck.webp', 'Clino team carefully cleaning a yacht deck'],
+      ['assets/clino-yacht-interior.webp', 'Clino team polishing a yacht interior'],
+      ['assets/clino-yacht-glass.webp', 'Clino cleaner polishing yacht glass'],
+      ['assets/clino-yacht-steel.webp', 'Clino cleaner caring for yacht stainless steel'],
+      ['assets/clino-yacht-cabin.webp', 'Freshly cared-for yacht cabin'],
+      ['assets/clino-yacht-hull.webp', 'Professional yacht exterior wash'],
+      ['assets/clino-yacht-carpet.webp', 'Clino team vacuuming a yacht carpet']
+    ];
+    const heroImages = [...document.querySelectorAll('[data-hero-slide]')];
+    let activeHero = 0;
+    let activeSlide = 0;
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches && heroImages.length === 2) {
+      window.setInterval(() => {
+        if (document.hidden) return;
+        const nextHero = 1 - activeHero;
+        const image = heroImages[nextHero];
+        const slide = yachtHeroSlides[(activeSlide + 1) % yachtHeroSlides.length];
+        const preload = new Image();
+        preload.onload = () => {
+          image.src = slide[0];
+          image.alt = slide[1];
+          image.classList.add('is-current');
+          image.setAttribute('aria-hidden', 'false');
+          heroImages[activeHero].classList.remove('is-current');
+          heroImages[activeHero].setAttribute('aria-hidden', 'true');
+          activeHero = nextHero;
+          activeSlide = (activeSlide + 1) % yachtHeroSlides.length;
+        };
+        preload.src = slide[0];
+      }, 5000);
+    }
+    const avatarTrack = document.querySelector('.client-faces');
+    if (avatarTrack) {
+      let pointerStart = 0, scrollStart = 0, moved = false;
+      avatarTrack.addEventListener('pointerdown', event => { pointerStart = event.clientX; scrollStart = avatarTrack.scrollLeft; moved = false; avatarTrack.classList.add('dragging'); avatarTrack.setPointerCapture(event.pointerId); });
+      avatarTrack.addEventListener('pointermove', event => { if (!avatarTrack.hasPointerCapture(event.pointerId)) return; const delta = event.clientX - pointerStart; if (Math.abs(delta) > 3) moved = true; avatarTrack.scrollLeft = scrollStart - delta; });
+      const endDrag = () => avatarTrack.classList.remove('dragging');
+      avatarTrack.addEventListener('pointerup', endDrag);
+      avatarTrack.addEventListener('pointercancel', endDrag);
+    }
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
@@ -507,7 +601,7 @@
       }
       gsap.registerPlugin(ScrollTrigger);
       gsap.from('.hero-copy > *', { y: 18, opacity: 0, duration: .72, stagger: .075, ease: 'power2.out' });
-      gsap.from('.hero-kit', { y: 24, scale: .97, opacity: 0, duration: .9, delay: .12, ease: 'power2.out' });
+      gsap.from('.hero-kit.is-current', { y: 24, scale: .97, opacity: 0, duration: .9, delay: .12, ease: 'power2.out' });
 
       const headingTargets = gsap.utils.toArray('.hero-title, .section-heading, .quote-band h2');
       headingTargets.forEach((heading, index) => {

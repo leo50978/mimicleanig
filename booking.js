@@ -1,0 +1,66 @@
+const firebaseConfig = {
+  apiKey: 'AIzaSyANt0dZtL-6P6l84ab-FSRIX9ISPd_YCe6I',
+  authDomain: 'cpieo-99bd5.firebaseapp.com',
+  projectId: 'cpieo-99bd5',
+  storageBucket: 'cpieo-99bd5.firebasestorage.app',
+  messagingSenderId: '405125968337',
+  appId: '1:405125968337:web:7d5f74b710cc23b84270f0'
+};
+let firestoreTools;
+async function getFirestoreTools() {
+  if (!firestoreTools) firestoreTools = Promise.all([
+    import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js'),
+    import('https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js')
+  ]).then(([app, firestore]) => ({ db: firestore.getFirestore(app.initializeApp(firebaseConfig)), ...firestore }));
+  return firestoreTools;
+}
+const dialog = document.getElementById('bookingDialog');
+const form = document.getElementById('bookingForm');
+const dateInput = document.getElementById('bookingDate');
+const status = document.getElementById('bookingStatus');
+const submit = form?.querySelector('[type="submit"]');
+const localToday = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+if (dateInput) dateInput.min = localToday();
+document.querySelectorAll('[data-book-plan]').forEach(button => button.addEventListener('click', () => {
+  const plan = button.closest('.plan')?.querySelector('h3')?.textContent.trim() || button.dataset.bookPlan;
+  form.elements.plan.value = plan;
+  document.getElementById('selectedPlan').textContent = plan;
+  status.textContent = '';
+  dialog.showModal();
+}));
+document.querySelector('[data-close-dialog]')?.addEventListener('click', () => dialog?.close());
+dialog?.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+form?.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!form.reportValidity()) return;
+  const values = new FormData(form);
+  if (values.get('date') < localToday()) {
+    status.textContent = 'Please choose a future date.';
+    return;
+  }
+  const booking = {
+    name: String(values.get('name')).trim(),
+    email: String(values.get('email')).trim().toLowerCase(),
+    date: String(values.get('date')),
+    time: String(values.get('time')),
+    plan: String(values.get('plan')),
+  };
+  if (submit) { submit.disabled = true; submit.textContent = 'Sending request…'; }
+  status.textContent = 'Saving your request securely…';
+  try {
+    const { db, addDoc, collection, serverTimestamp: _serverTimestamp } = await getFirestoreTools();
+    booking.createdAt = _serverTimestamp();
+    await addDoc(collection(db, 'bookings'), booking);
+    status.textContent = 'Thanks! Your request is booked. Our team will follow up by email.';
+    form.reset();
+    if (dateInput) dateInput.min = localToday();
+  } catch (error) {
+    console.error('Clino booking could not be saved.', error);
+    status.textContent = 'We couldn’t save your request right now. Please call +1 (561) 275-4445 and we’ll help.';
+  } finally {
+    if (submit) { submit.disabled = false; submit.textContent = 'Request this booking'; }
+  }
+});
