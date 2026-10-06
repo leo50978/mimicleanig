@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f9ff"><meta name="robots" content="noindex,nofollow"><title>Private dashboard | Clino</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="pages.css"><link rel="stylesheet" href="admin.css">
+  <script src="admin.js" defer></script>
+</head>
+<body class="admin-page">
+  <header class="admin-top"><a class="brand" href="index.html" aria-label="Back to Clino"><svg class="brand-icon" viewBox="0 0 28 32" fill="none" aria-hidden="true"><path d="M10 2.5a1.7 1.7 0 1 1 0 3.4 1.7 1.7 0 0 1 0-3.4ZM18 5.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" fill="currentColor"/><path d="M4.5 9h18v18.2c0 1.1-.9 2-2 2h-14c-1.1 0-2-.9-2-2V9Z" fill="currentColor"/><path d="M9 14.5v5.2M18 14.5v5.2M8 23c3.6 2.4 7.4 2.4 11 0" stroke="#211c37" stroke-width="1.6" stroke-linecap="round"/></svg><span>Clino</span></a><a href="index.html" class="back-link">← Back to website</a></header>
+  <main class="admin-main wrap">
+    <section class="admin-panel glass-card" id="loginPanel" aria-labelledby="adminTitle">
+      <span class="eyebrow">Private access</span><h1 id="adminTitle">Clino dashboard</h1><p>Enter your access code to view booking requests and email sign-ups.</p>
+      <form id="adminLogin"><label for="adminCode">Access code</label><div class="code-row"><input id="adminCode" name="code" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="one-time-code" required aria-describedby="adminStatus"><button class="button" type="submit">Continue</button></div></form>
+      <p class="admin-status" id="adminStatus" role="status" aria-live="polite"></p>
+    </section>
+    <section class="dashboard" id="dashboard" hidden>
+      <div class="dashboard-head"><div><span class="eyebrow">Private overview</span><h1>Cleaning requests</h1><p>Latest bookings and newsletter sign-ups.</p></div><button class="button outline" id="adminLogout" type="button">Sign out</button></div>
+      <section class="data-panel glass-card"><h2>Booking messages <span id="bookingCount">0</span></h2><div id="bookingList" class="data-list"></div></section>
+      <section class="data-panel glass-card"><h2>Email sign-ups <span id="subscriberCount">0</span></h2><div id="subscriberList" class="email-list"></div></section>
+      <p class="admin-status" id="dashboardStatus" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+</body>
+</html>

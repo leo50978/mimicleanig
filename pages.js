@@ -3,8 +3,8 @@
   const nav = document.getElementById('navLinks');
   const openButton = document.querySelector('.menu-button');
   const closeButton = document.querySelector('.menu-close');
-  const backdrop = document.querySelector('.backdrop');
-  const mobile = matchMedia('(max-width:760px)');
+  const backdrop = document.getElementById('navBackdrop');
+  const mobile = matchMedia('(max-width:960px)');
   function setMenu(open, focus = true) {
     if (!nav || !openButton) return;
     nav.classList.toggle('open', open);
@@ -52,13 +52,6 @@
   }));
   document.querySelector('.dialog-close')?.addEventListener('click', () => dialog?.close());
   dialog?.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
-  document.querySelectorAll('.newsletter-form').forEach(form => form.addEventListener('submit', event => {
-    event.preventDefault();
-    const button = form.querySelector('button');
-    let note = form.querySelector('[role="status"]');
-    if (!note) { note = document.createElement('p'); note.setAttribute('role', 'status'); note.className = 'article-meta'; form.append(note); }
-    note.textContent = 'Newsletter sign-ups are coming soon. Browse the latest stories here in the meantime.';
-  }));
   const animate = () => {
     if (!window.gsap || !window.ScrollTrigger || matchMedia('(prefers-reduced-motion:reduce)').matches) {
       document.querySelectorAll('.rise').forEach(item => { item.style.opacity = 1; item.style.transform = 'none'; });

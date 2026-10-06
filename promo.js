@@ -2,10 +2,10 @@ const promoDialog = document.getElementById('promoDialog');
 const promoStatus = document.getElementById('promoStatus');
 const promoVideo = document.getElementById('promoVideo');
 const filmImages = [
-  'assets/clino-yacht-deck.webp', 'assets/clino-yacht-interior.webp',
-  'assets/clino-yacht-glass.webp', 'assets/clino-yacht-steel.webp',
-  'assets/clino-yacht-cabin.webp', 'assets/clino-yacht-hull.webp',
-  'assets/clino-yacht-cockpit.webp'
+  'assets/clino-film-home.webp', 'assets/clino-film-kitchen.webp',
+  'assets/clino-film-office.webp', 'assets/clino-film-yacht-wash.webp',
+  'assets/clino-film-yacht-interior.webp', 'assets/clino-film-yacht-glass.webp',
+  'assets/clino-film-yacht-cabin.webp'
 ];
 let filmUrl = '';
 let generating = false;

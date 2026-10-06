@@ -47,6 +47,7 @@ form?.addEventListener('submit', async event => {
     date: String(values.get('date')),
     time: String(values.get('time')),
     plan: String(values.get('plan')),
+    message: String(values.get('message') || '').trim().slice(0, 1200),
   };
   if (submit) { submit.disabled = true; submit.textContent = 'Sending request…'; }
   status.textContent = 'Saving your request securely…';
@@ -63,4 +64,27 @@ form?.addEventListener('submit', async event => {
   } finally {
     if (submit) { submit.disabled = false; submit.textContent = 'Request this booking'; }
   }
+});
+
+document.querySelectorAll('#newsletterForm, form[data-newsletter-signup]').forEach(newsletterForm => {
+  newsletterForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!newsletterForm.reportValidity()) return;
+    const email = String(new FormData(newsletterForm).get('email')).trim().toLowerCase();
+    const button = newsletterForm.querySelector('[type="submit"]');
+    const note = newsletterForm.querySelector('[role="status"]') || newsletterForm.parentElement.querySelector('#newsletterStatus');
+    if (button) { button.disabled = true; button.setAttribute('aria-busy', 'true'); }
+    if (note) note.textContent = 'Saving your email…';
+    try {
+      const { db, addDoc, collection, serverTimestamp } = await getFirestoreTools();
+      await addDoc(collection(db, 'subscribers'), { email, createdAt: serverTimestamp() });
+      if (note) note.textContent = 'Thank you. You’re on the list.';
+      newsletterForm.reset();
+    } catch (error) {
+      console.error('Clino email signup could not be saved.', error);
+      if (note) note.textContent = 'We couldn’t save your email right now. Please try again shortly.';
+    } finally {
+      if (button) { button.disabled = false; button.removeAttribute('aria-busy'); }
+    }
+  });
 });
