@@ -1,4 +1,5 @@
-const STORAGE_KEY = 'clino.reviews.v1';
+import { getFirestoreTools } from './firebase-client.js';
+
 const form = document.getElementById('reviewForm');
 const grid = document.getElementById('testimonialList');
 const status = document.getElementById('reviewFormStatus');
@@ -6,26 +7,17 @@ const average = document.getElementById('averageRating');
 const submit = form?.querySelector('[type="submit"]');
 if (!form || !grid || !status || !average) throw new Error('Review UI is incomplete.');
 
-const staticRatings = [...grid.querySelectorAll('.testimonial-card .rating[data-rating]')]
-  .map(node => Number(node.dataset.rating)).filter(rating => rating === 4 || rating === 5);
+const staticCards = [...grid.querySelectorAll('.testimonial-card .rating[data-rating]')];
+const staticRatings = staticCards.map(node => Number(node.dataset.rating)).filter(rating => Number.isInteger(rating) && rating >= 1 && rating <= 5);
 const isValidReview = review => review && typeof review.name === 'string' && review.name.trim().length >= 2
   && typeof review.message === 'string' && review.message.trim().length >= 12
-  && [4, 5].includes(Number(review.rating)) && typeof review.createdAt === 'string';
-
-function readLocalReviews() {
-  try {
-    const reviews = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    return Array.isArray(reviews) ? reviews.filter(isValidReview) : [];
-  } catch {
-    return [];
-  }
-}
+  && Number.isInteger(Number(review.rating)) && Number(review.rating) >= 1 && Number(review.rating) <= 5;
 
 function updateAverage(reviews) {
   const ratings = [...staticRatings, ...reviews.map(review => Number(review.rating))];
   if (!ratings.length) return;
   const value = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
-  average.textContent = Math.max(4.5, value).toFixed(1);
+  average.textContent = value.toFixed(1);
 }
 
 function formatDate(value) {
@@ -68,10 +60,43 @@ function renderReviews(reviews) {
   updateAverage(reviews);
 }
 
-let savedReviews = readLocalReviews();
-renderReviews(savedReviews);
+function mapSnapshotReview(documentSnapshot) {
+  const data = documentSnapshot.data();
+  const createdAt = data.createdAt?.toDate?.();
+  const review = {
+    name: data.name,
+    rating: Number(data.rating),
+    message: data.message,
+    createdAt: createdAt?.toISOString() || ''
+  };
+  return isValidReview(review) && createdAt ? review : null;
+}
 
-form.addEventListener('submit', event => {
+let currentReviews = [];
+let firestore;
+let reviewsCollection;
+let liveQuery;
+let unsubscribe;
+
+async function connectReviews() {
+  try {
+    firestore = await getFirestoreTools();
+    reviewsCollection = firestore.collection(firestore.db, 'reviews');
+    liveQuery = firestore.query(reviewsCollection, firestore.orderBy('createdAt', 'desc'), firestore.limit(50));
+    unsubscribe = firestore.onSnapshot(liveQuery, snapshot => {
+      currentReviews = snapshot.docs.map(mapSnapshotReview).filter(Boolean);
+      renderReviews(currentReviews);
+    }, error => {
+      console.error('Clino reviews could not be loaded.', error);
+      status.textContent = 'Reviews are temporarily unavailable. Please try again later.';
+    });
+  } catch (error) {
+    console.error('Clino reviews could not connect to Firestore.', error);
+    status.textContent = 'Reviews are temporarily unavailable. Please try again later.';
+  }
+}
+
+form.addEventListener('submit', async event => {
   event.preventDefault();
   status.textContent = '';
   if (!form.reportValidity()) return;
@@ -79,22 +104,37 @@ form.addEventListener('submit', event => {
   const review = {
     name: String(values.get('name') || '').trim(),
     rating: Number(values.get('rating')),
-    message: String(values.get('message') || '').trim(),
-    createdAt: new Date().toISOString()
+    message: String(values.get('message') || '').trim()
   };
   if (!isValidReview(review)) {
-    status.textContent = 'Enter your name, a comment and either 4 or 5 stars.';
+    status.textContent = 'Enter your name, a comment and a rating from 1 to 5 stars.';
     return;
   }
-  savedReviews = [review, ...savedReviews];
+  if (!firestore || !reviewsCollection || !submit) {
+    status.textContent = 'Reviews are temporarily unavailable. Please try again later.';
+    return;
+  }
+
+  submit.disabled = true;
+  submit.textContent = 'Posting review…';
+  status.textContent = 'Posting your review…';
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedReviews));
-    status.textContent = 'Thank you. Your review is saved in this browser and appears in the list below.';
-  } catch {
-    status.textContent = 'Your browser could not save this review. Please check its storage settings and try again.';
-    savedReviews.shift();
-    return;
+    await firestore.addDoc(reviewsCollection, {
+      ...review,
+      createdAt: firestore.serverTimestamp()
+    });
+    status.textContent = 'Thank you. Your review is now shared with visitors.';
+    form.reset();
+  } catch (error) {
+    console.error('Clino review could not be saved.', error);
+    status.textContent = error?.code === 'permission-denied'
+      ? 'Reviews are temporarily unavailable. Please try again later.'
+      : 'Your review could not be posted. Please try again shortly.';
+  } finally {
+    submit.disabled = false;
+    submit.textContent = 'Post your review';
   }
-  form.reset();
-  renderReviews(savedReviews);
 });
+
+window.addEventListener('pagehide', () => unsubscribe?.(), { once: true });
+connectReviews();

@@ -83,7 +83,8 @@
     .hero-stat span { flex: 1; min-width: 0; max-width: none; font-size: 10px; font-weight: 900; line-height: 1.25; white-space: normal; text-wrap: balance; }
     .hero-art { position: relative; align-self: center; display: grid; place-items: center; min-width: 0; min-height: 0; margin: -10px -35px -18px 0; }
     .hero-art:before { content: ''; position: absolute; width: min(95%, 525px); aspect-ratio: 1; top: 12%; right: -1%; border-radius: 50%; background: radial-gradient(circle, #baf6f5a6 0 33%, #ffffff00 70%); }
-    .hero-kit { position: relative; z-index: 1; display: block; width: min(100%, 570px); height: clamp(320px, 36vw, 465px); object-fit: cover; object-position: center; border: 8px solid #ffffffa8; border-radius: 28px; box-shadow: 0 24px 60px #274ab324; opacity: 1; transition: opacity .22s ease; }
+    .hero-media-frame { position: relative; z-index: 1; display: block; width: min(100%, 570px); height: clamp(320px, 36vw, 465px); overflow: hidden; border: 8px solid #ffffffa8; border-radius: 28px; background: #eaf0f8; box-shadow: 0 24px 60px #274ab324; }
+    .hero-kit { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: 1; transition: opacity .22s ease; }
     .hero-kit.is-changing { opacity: 0; }
     .bubble { position: absolute; z-index: 2; border: 2px solid #a6baf2a1; border-radius: 50%; }
     .bubble-one { width: 14px; height: 14px; left: 1%; top: 26%; }
@@ -219,7 +220,7 @@
       .hero-shell { min-height: 650px; }
       .hero-inner { grid-template-columns: .94fr 1.06fr; }
       .hero-art { margin-right: -25px; }
-      .hero-kit { width: 110%; }
+      .hero-media-frame { width: min(100%, 570px); }
       .feature-row { gap: 14px; }
       .feature-card { padding: 23px; }
       .about-grid, .choose-grid { gap: 40px; }
@@ -264,7 +265,7 @@
       .hero-copy > p { max-width: 500px; }
       .hero-art { min-height: 370px; margin: -8px -18px -38px; }
       .hero-art:before { width: 88%; top: 0; right: 1%; }
-      .hero-kit { width: min(100%, 455px); max-height: 430px; }
+      .hero-media-frame { width: min(100%, 455px); height: min(430px, 75vw); }
       .feature-row { grid-template-columns: 1fr; gap: 12px; margin-top: 0; }
       .feature-card { min-height: 0; display: grid; grid-template-columns: 42px 1fr; column-gap: 10px; align-items: center; padding: 18px 21px; border-radius: 18px; }
       .feature-icon { grid-row: span 2; width: 30px; margin: 0; }
@@ -376,9 +377,9 @@
     .service-menu-actions .button { width: auto; min-width: 155px; border-radius: 8px; }
     .button-services .round-icon i { font-size: 16px; }
 
-    @media (max-width: 960px) { .hero-art { margin: -6px -18px 0 0; } .hero-kit { width: 100%; height: clamp(300px, 43vw, 410px); } }
-    @media (max-width: 760px) { .hero-art { min-height: 0; margin: 0; } .hero-kit { width: min(100%, 500px); height: clamp(255px, 74vw, 360px); } }
-    @media (max-width: 420px) { .hero-kit { height: clamp(225px, 72vw, 300px); } }
+    @media (max-width: 960px) { .hero-art { margin: -6px -18px 0 0; } .hero-media-frame { width: 100%; height: clamp(300px, 43vw, 410px); } }
+    @media (max-width: 760px) { .hero-art { min-height: 0; margin: 0; } .hero-media-frame { width: min(100%, 500px); height: clamp(255px, 74vw, 360px); } }
+    @media (max-width: 420px) { .hero-media-frame { height: clamp(225px, 72vw, 300px); } }
     .feature-card, .hero-stat, .plan, .service-card, .testimonial-card { min-width: 0; }
     .hero-title, .hero-copy > p, .hero-stat span, .feature-card h3, .feature-card p, .service-meta h3 { overflow-wrap: anywhere; hyphens: auto; }
 </style>
@@ -396,7 +397,7 @@
 <div class="client-proof"><div aria-label="Illustrative portraits. Scroll horizontally to see more." class="client-faces"><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-12644996.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-30004315.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-37600418.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-38889899.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-7624514.webp"/><span aria-label="64 more clients" class="more-clients">+64</span></div><span>Home, business &amp; marine care</span></div>
 <div class="hero-stats"><div class="hero-stat glass-card"><strong data-count="800" data-suffix="+">800+</strong><span>Happy Clients</span></div><div class="hero-stat glass-card"><strong data-count="180" data-suffix="+">180+</strong><span>Awards Received</span></div></div>
 </div>
-<div class="hero-art"><span class="bubble bubble-one"></span><span class="bubble bubble-two"></span><img alt="Worker cleaning a teak yacht deck by hand." class="hero-kit" data-hero-slide="0" fetchpriority="high" src="assets/clino-photo-5416343.webp"/></div>
+<div class="hero-art"><span class="bubble bubble-one"></span><span class="bubble bubble-two"></span><div class="hero-media-frame"><img alt="Worker cleaning a teak yacht deck by hand." class="hero-kit" data-hero-slide="0" fetchpriority="high" src="assets/clino-photo-5416343.webp"/></div></div>
 </div>
 </section>
 <div aria-label="Why customers choose Clino" class="feature-row wrap">
@@ -528,25 +529,48 @@
     const heroImage = document.querySelector('[data-hero-slide]');
     let activeSlide = 0;
     let heroSwapInProgress = false;
+    const waitForOpacityTransition = image => new Promise(resolve => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        image.removeEventListener('transitionend', onEnd);
+        window.clearTimeout(fallback);
+        resolve();
+      };
+      const onEnd = event => { if (event.target === image && event.propertyName === 'opacity') finish(); };
+      const fallback = window.setTimeout(finish, 500);
+      image.addEventListener('transitionend', onEnd);
+    });
     if (heroImage && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      window.setInterval(() => {
+      window.setInterval(async () => {
         if (document.hidden || heroSwapInProgress) return;
         const nextIndex = (activeSlide + 1) % yachtHeroSlides.length;
         const [nextSource, nextAlt] = yachtHeroSlides[nextIndex];
         const preload = new Image();
         heroSwapInProgress = true;
-        preload.onload = () => {
-          heroImage.classList.add('is-changing');
-          window.setTimeout(() => {
-            heroImage.src = nextSource;
-            heroImage.alt = nextAlt;
-            heroImage.classList.remove('is-changing');
-            activeSlide = nextIndex;
-            heroSwapInProgress = false;
-          }, 230);
-        };
-        preload.onerror = () => { heroSwapInProgress = false; };
         preload.src = nextSource;
+        try {
+          if (preload.decode) await preload.decode();
+          else if (!preload.complete) await new Promise((resolve, reject) => {
+            preload.addEventListener('load', resolve, { once: true });
+            preload.addEventListener('error', reject, { once: true });
+          });
+          if (!preload.naturalWidth) throw new Error('Hero slide failed to load.');
+          heroImage.classList.add('is-changing');
+          await waitForOpacityTransition(heroImage);
+          heroImage.src = nextSource;
+          heroImage.alt = nextAlt;
+          if (heroImage.decode) await heroImage.decode();
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          heroImage.classList.remove('is-changing');
+          activeSlide = nextIndex;
+        } catch (error) {
+          console.error('Clino hero image could not be changed.', error);
+          heroImage.classList.remove('is-changing');
+        } finally {
+          heroSwapInProgress = false;
+        }
       }, 5000);
     }
     const avatarTrack = document.querySelector('.client-faces');
