@@ -224,6 +224,17 @@
       .plan { padding: 24px 21px; }
       .footer-grid { gap: 28px; }
     }
+    @media (min-width: 761px) and (max-width: 960px) {
+      .menu-button { display: grid; place-items: center; }
+      .nav-backdrop { position: fixed; inset: 0; z-index: 1; display: block; width: 100%; height: 100dvh; padding: 0; border: 0; background: #10173370; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility .3s linear .38s; }
+      .nav-backdrop.open { opacity: 1; visibility: visible; transition-delay: 0s; }
+      .nav-links { position: fixed; z-index: 2; top: 0; right: 0; left: auto; display: flex; flex-direction: column; align-items: stretch; gap: 0; width: 50vw; height: 120vh; height: 120dvh; margin: 0; padding: max(22px, env(safe-area-inset-top)) 20px 40px; border: 1px solid #ffffffbd; border-right: 0; border-radius: 28px 0 0 28px; background: linear-gradient(150deg, #ffffffd9 0%, #f6f8ffd0 48%, #dffaffc9 100%); -webkit-backdrop-filter: blur(34px) saturate(175%); backdrop-filter: blur(34px) saturate(175%); box-shadow: -24px 0 75px #141d3f38, inset 1px 0 0 #ffffffd9, inset 0 1px 0 #ffffffd9; transform: translateX(105%); visibility: hidden; transition: transform .48s cubic-bezier(.2,.85,.25,1), visibility 0s linear .48s; }
+      .nav-links.open { transform: translateX(0); visibility: visible; transition-delay: 0s; }
+      .menu-close { width: 42px; height: 42px; flex: none; align-self: end; margin: 0 -8px 26px 0; padding: 0; border: 1px solid #ffffffb8; border-radius: 50%; display: grid; place-items: center; color: var(--ink); background: #ffffffa6; box-shadow: inset 0 1px 0 #fff, 0 8px 18px #26396b16; }
+      .nav-links a { padding: 15px 2px; border-bottom: 1px solid #ffffff9c; font-size: 13px; }
+      .nav-links a:last-child { border: 0; }
+      .nav-tools { margin-left: auto; }
+    }
     @media (max-width: 760px) {
       .wrap { width: calc(100% - 36px); }
       .site-header { position: absolute; }
@@ -390,7 +401,7 @@
     const menuClose = document.getElementById('menuClose');
     const navLinks = document.getElementById('navLinks');
     const navBackdrop = document.getElementById('navBackdrop');
-    const mobileNavQuery = matchMedia('(max-width: 760px)');
+    const mobileNavQuery = matchMedia('(max-width: 960px)');
     navLinks.setAttribute('aria-hidden', String(mobileNavQuery.matches));
     mobileNavQuery.addEventListener('change', event => {
       if (event.matches) setMenuOpen(false, false);
