@@ -1,19 +1,4 @@
-const firebaseConfig = {
-  apiKey: 'AIzaSyANt0dZtL-6P6l84ab-FSRIX9ISPd_YCe6I',
-  authDomain: 'cpieo-99bd5.firebaseapp.com',
-  projectId: 'cpieo-99bd5',
-  storageBucket: 'cpieo-99bd5.firebasestorage.app',
-  messagingSenderId: '405125968337',
-  appId: '1:405125968337:web:7d5f74b710cc23b84270f0'
-};
-let firestoreTools;
-async function getFirestoreTools() {
-  if (!firestoreTools) firestoreTools = Promise.all([
-    import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js'),
-    import('https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js')
-  ]).then(([app, firestore]) => ({ db: firestore.getFirestore(app.initializeApp(firebaseConfig)), ...firestore }));
-  return firestoreTools;
-}
+import { getFirestoreTools } from './firebase-client.js';
 const dialog = document.getElementById('bookingDialog');
 const form = document.getElementById('bookingForm');
 const dateInput = document.getElementById('bookingDate');

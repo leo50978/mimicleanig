@@ -72,24 +72,25 @@
     .client-faces { display: flex; align-items: center; gap: 5px; width: min(52vw, 218px); overflow-x: auto; padding: 2px 1px 5px; scrollbar-width: none; cursor: grab; touch-action: pan-x; }
     .client-faces::-webkit-scrollbar { display:none; }
     .client-faces.dragging { cursor: grabbing; user-select:none; }
-    .client-faces span { width: 37px; height: 37px; flex: none; border: 2px solid #f3f8ff; border-radius: 50%; display: grid; place-items: center; background: #fff; color: var(--blue-deep); font-size: 8px; font-weight: 900; }
-    .client-faces img { position: relative; width: 36px; height: 36px; flex: none; border: 2px solid #f3f8ff; border-radius: 50%; object-fit: cover; background: #fff; }
-    .client-faces span:last-child { width: 37px; height: 37px; background: var(--blue); color: #fff; font-size: 9px; }
-    .client-faces span[aria-label] { background: var(--blue); color: #fff; }
+    .client-faces .more-clients { width: 38px; height: 38px; flex: none; border: 2px solid #f3f8ff; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: #fff; font-size: 9px; font-weight: 900; }
+    .client-faces img { position: relative; width: 38px; height: 38px; flex: none; border: 2px solid #f3f8ff; border-radius: 50%; object-fit: cover; background: #fff; }
+
     .hero-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(100%, 380px); gap: 10px; margin-top: 21px; }
     .hero-stat { min-width: 0; padding: 10px 12px; border-radius: 15px; display: flex; align-items: flex-start; flex-direction: column; gap: 5px; background: #fff; box-shadow: 0 12px 35px #3b5cae10; }
-    .hero-stat strong { display: inline-block; flex: none; min-width: 4.1ch; color: var(--blue); font: 700 25px/1 var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .hero-stat strong { display: block; min-width: 0; max-width: 100%; color: var(--blue); font: 700 clamp(20px, 2.4vw, 25px)/1.12 var(--display); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .hero-stat, .hero-stat span, .hero-copy, .hero-copy > p { min-width: 0; overflow-wrap: anywhere; hyphens: auto; }
+    .hero-title { max-width: 100%; text-wrap: balance; overflow-wrap: anywhere; hyphens: auto; }
     .hero-stat span { flex: 1; min-width: 0; max-width: none; font-size: 10px; font-weight: 900; line-height: 1.25; white-space: normal; text-wrap: balance; }
-    .hero-art { position: relative; align-self: stretch; display: grid; place-items: center; min-width: 0; margin: -10px -47px -46px -28px; }
+    .hero-art { position: relative; align-self: center; display: grid; place-items: center; min-width: 0; min-height: 0; margin: -10px -35px -18px 0; }
     .hero-art:before { content: ''; position: absolute; width: min(95%, 525px); aspect-ratio: 1; top: 12%; right: -1%; border-radius: 50%; background: radial-gradient(circle, #baf6f5a6 0 33%, #ffffff00 70%); }
-    .hero-kit { position: absolute; z-index: 1; width: min(125%, 615px); max-height: 590px; object-fit: contain; filter: drop-shadow(0 28px 25px #274ab348); opacity: 0; transition: opacity .9s ease; }
-    .hero-kit.is-current { opacity: 1; }
+    .hero-kit { position: relative; z-index: 1; display: block; width: min(100%, 570px); height: clamp(320px, 36vw, 465px); object-fit: cover; object-position: center; border: 8px solid #ffffffa8; border-radius: 28px; box-shadow: 0 24px 60px #274ab324; opacity: 1; transition: opacity .22s ease; }
+    .hero-kit.is-changing { opacity: 0; }
     .bubble { position: absolute; z-index: 2; border: 2px solid #a6baf2a1; border-radius: 50%; }
     .bubble-one { width: 14px; height: 14px; left: 1%; top: 26%; }
     .bubble-two { width: 8px; height: 8px; left: 5%; top: 32%; background: #9ab2f2; border: 0; }
     .feature-row { position: relative; z-index: 5; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: -43px; }
     .feature-card { min-height: 154px; padding: 27px 33px; border-radius: 24px; box-shadow: 0 18px 42px #273b7920; }
-    .feature-icon { width: 34px; height: 34px; margin-bottom: 9px; color: #6682d6; }
+    .feature-icon { display: block; width: 34px; height: 34px; margin-bottom: 9px; color: #6682d6; font-size: 27px; line-height: 34px; text-align: center; }
     .feature-card h3 { margin: 0 0 4px; font-size: 18px; letter-spacing: 0; }
     .feature-card p { max-width: 260px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
     .section { position: relative; padding: 105px 0; background: #fbfcff; }
@@ -124,13 +125,15 @@
     .carousel-arrow:hover { background: var(--blue); color: #fff; }
     .services-list { position: relative; z-index: 1; display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 44px) / 3); grid-template-columns: none; gap: 22px; overflow-x: auto; padding: 2px 3px 15px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
     .service-card { min-width: 0; overflow: hidden; padding: 12px; border-radius: 22px; box-shadow: 0 15px 35px #415b9d12; }
-    .service-card { scroll-snap-align: start; }
+    .service-card { scroll-snap-align: start; transition: transform .25s ease, box-shadow .25s ease; }
+    .service-card:hover { transform: translateY(-3px); box-shadow: 0 18px 36px #415b9d1b; }
     .service-image { position: relative; overflow: hidden; height: 226px; border-radius: 17px; background: #d9e8f6; }
     .service-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
     .service-card:hover .service-image img { transform: scale(1.04); }
     .rating { position: absolute; top: 12px; right: 12px; padding: 6px 11px; border-radius: 999px; background: #fff; color: var(--ink); font-size: 10px; font-weight: 900; }
     .service-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 5px 4px; }
-    .service-meta h3 { margin: 0; color: #4868c7; font-size: 17px; letter-spacing: 0; }
+    .service-meta h3 { min-width: 0; margin: 0; color: #33415f; font-size: 16px; line-height: 1.3; letter-spacing: -.01em; }
+    .service-link i { font-size: 15px; }
     .service-link { width: 39px; height: 39px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: #fff; }
     .service-card:nth-child(2) .service-link { background: #fff; color: var(--ink); }
     .carousel-dots { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 20px; }
@@ -327,8 +330,8 @@
       .nav-links, .nav-backdrop { transition-duration: .01ms !important; }
     }
 
-    .client-faces img,.client-faces span { animation: avatar-arrive .42s both; }
-    .client-faces > :nth-child(2) { animation-delay:.05s }.client-faces > :nth-child(3) { animation-delay:.1s }.client-faces > :nth-child(4) { animation-delay:.15s }.client-faces > :nth-child(5) { animation-delay:.2s }.client-faces > :nth-child(n+6) { animation-delay:.28s }
+    .client-faces img,.client-faces .more-clients { animation: avatar-arrive .42s both; }
+    .client-faces > :nth-child(2) { animation-delay:.05s }.client-faces > :nth-child(3) { animation-delay:.1s }.client-faces > :nth-child(4) { animation-delay:.15s }.client-faces > :nth-child(5) { animation-delay:.2s }.client-faces > :nth-child(n+6) { animation-delay:.25s }
     @keyframes avatar-arrive { from { opacity:.25; transform:translateX(9px) scale(.9) } to { opacity:1; transform:translateX(0) scale(1) } }
     .dialog { width:min(540px,calc(100% - 28px)); max-height:min(88vh,850px); padding:0; border:1px solid #ffffffcf; border-radius:25px; background:linear-gradient(145deg,#fafdff,#e9f4ff); color:var(--ink); box-shadow:0 28px 90px #10173366; }
     .dialog::backdrop { background:#10173394; backdrop-filter:blur(8px); }
@@ -357,7 +360,7 @@
     .promo-frame video { display:block;width:100%;height:100%;min-height:0;object-fit:contain;border-radius:16px;background:#dce8f6; }
     .promo-controls { display:flex;justify-content:center;gap:10px;flex-wrap:wrap; }
     @media(max-width:600px) { .booking-row { grid-template-columns:1fr; }.booking-intro { align-items:flex-start;flex-direction:column; }.promo-dialog { width:80vw;height:80vh;max-width:80vw;max-height:80vh; }.promo-frame { height:calc(80vh - 78px);padding:13px; } }
-    @media(prefers-reduced-motion:reduce){.client-faces img,.client-faces span{animation:none}}
+    @media(prefers-reduced-motion:reduce){.client-faces img,.client-faces .more-clients{animation:none}}
 
     h1, h2, h3 { letter-spacing: -.035em; }
     .hero h1 { line-height: 1.04; }
@@ -372,6 +375,12 @@
     .service-menu-actions { justify-content: flex-start; gap: 10px; }
     .service-menu-actions .button { width: auto; min-width: 155px; border-radius: 8px; }
     .button-services .round-icon i { font-size: 16px; }
+
+    @media (max-width: 960px) { .hero-art { margin: -6px -18px 0 0; } .hero-kit { width: 100%; height: clamp(300px, 43vw, 410px); } }
+    @media (max-width: 760px) { .hero-art { min-height: 0; margin: 0; } .hero-kit { width: min(100%, 500px); height: clamp(255px, 74vw, 360px); } }
+    @media (max-width: 420px) { .hero-kit { height: clamp(225px, 72vw, 300px); } }
+    .feature-card, .hero-stat, .plan, .service-card, .testimonial-card { min-width: 0; }
+    .hero-title, .hero-copy > p, .hero-stat span, .feature-card h3, .feature-card p, .service-meta h3 { overflow-wrap: anywhere; hyphens: auto; }
 </style>
 <link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet"/></head>
 <body>
@@ -384,16 +393,16 @@
 <h1 class="hero-title">A cleaner space<br/>starts here</h1>
 <p>Experience the epitome of cleanliness with Clino. We provide top-notch cleaning services tailored to your needs, ensuring your spaces shine with perfection.</p>
 <div class="hero-ctas"><a class="button button-services" href="#services">Hire Services <span class="round-icon"><i aria-hidden="true" class="fa-solid fa-spray-can"></i></span></a><button aria-label="Watch how Clino works" class="play-button" id="openPromo" type="button"><svg aria-hidden="true" fill="currentColor" height="15" viewbox="0 0 12 14" width="13"><path d="M11 7 1 13V1l10 6Z"></path></svg></button><span class="play-label">How it works</span></div>
-<div class="client-proof"><div aria-label="Home, business and yacht cleaning" class="client-faces"><span aria-hidden="true">H</span><span aria-hidden="true">B</span><span aria-hidden="true">Y</span></div><span>Home, business &amp; marine care</span></div>
+<div class="client-proof"><div aria-label="Illustrative portraits. Scroll horizontally to see more." class="client-faces"><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-12644996.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-30004315.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-37600418.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-38889899.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-7624514.webp"/><span aria-label="64 more clients" class="more-clients">+64</span></div><span>Home, business &amp; marine care</span></div>
 <div class="hero-stats"><div class="hero-stat glass-card"><strong data-count="800" data-suffix="+">800+</strong><span>Happy Clients</span></div><div class="hero-stat glass-card"><strong data-count="180" data-suffix="+">180+</strong><span>Awards Received</span></div></div>
 </div>
-<div class="hero-art"><span class="bubble bubble-one"></span><span class="bubble bubble-two"></span><img alt="Worker cleaning a teak yacht deck by hand." class="hero-kit is-current" data-hero-slide="0" fetchpriority="high" src="assets/clino-photo-5416343.webp"/><img alt="Bright yacht cabin with windows overlooking the water." aria-hidden="true" class="hero-kit" data-hero-slide="1" loading="lazy" src="assets/clino-photo-9349231.webp"/></div>
+<div class="hero-art"><span class="bubble bubble-one"></span><span class="bubble bubble-two"></span><img alt="Worker cleaning a teak yacht deck by hand." class="hero-kit" data-hero-slide="0" fetchpriority="high" src="assets/clino-photo-5416343.webp"/></div>
 </div>
 </section>
 <div aria-label="Why customers choose Clino" class="feature-row wrap">
-<article class="feature-card glass-card reveal"><svg aria-hidden="true" class="feature-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 40 40"><circle cx="13" cy="11" r="4"></circle><circle cx="26" cy="11" r="4"></circle><path d="M4.5 29v-7a5 5 0 0 1 5-5h7a5 5 0 0 1 5 5v7M18.5 19a5 5 0 0 1 4.5-3h4a5 5 0 0 1 5 5v5M10 22v10m9-10v10m4-9v7m7-7v7"></path></svg><h3>Expert Team</h3><p>Our highly trained professionals bring a wealth of experience.</p></article>
-<article class="feature-card glass-card reveal"><svg aria-hidden="true" class="feature-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 40 40"><path d="m6 31 11-24 12 24M11 20h13M5 32h28M25 9l7 4v13M28 17h4"></path><circle cx="31" cy="8" r="2"></circle></svg><h3>Quality Service</h3><p>We guarantee a spotless finish that exceeds your expectations.</p></article>
-<article class="feature-card glass-card reveal"><svg aria-hidden="true" class="feature-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 40 40"><path d="m4 17 16-12 16 12-16 18L4 17Z"></path><circle cx="13" cy="16" r="2"></circle><path d="m23 11 10 8M10 23l9 8"></path></svg><h3>Affordable Price</h3><p>Exceptional services at prices that are affordable for everyone.</p></article>
+<article class="feature-card glass-card reveal"><i aria-hidden="true" class="feature-icon fa-solid fa-people-group"></i><h3>Expert Team</h3><p>Our highly trained professionals bring a wealth of experience.</p></article>
+<article class="feature-card glass-card reveal"><i aria-hidden="true" class="feature-icon fa-solid fa-sparkles"></i><h3>Quality Service</h3><p>We guarantee a spotless finish that exceeds your expectations.</p></article>
+<article class="feature-card glass-card reveal"><i aria-hidden="true" class="feature-icon fa-solid fa-tags"></i><h3>Affordable Price</h3><p>Exceptional services at prices that are affordable for everyone.</p></article>
 </div>
 <section class="section" id="about">
 <div class="about-grid wrap">
@@ -404,17 +413,17 @@
 <section class="services-section section" id="services">
 <div class="wrap"><div class="section-topline"><div><span class="tag">Our Services</span><h2 class="section-heading">Cleaning for every<br/>kind of space</h2></div><div class="carousel-controls"><button aria-label="Previous services" class="carousel-arrow" id="servicePrev"><svg fill="none" height="16" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 16" width="20"><path d="M22 8H3m0 0 6-6M3 8l6 6"></path></svg></button><button aria-label="Next services" class="carousel-arrow" id="serviceNext"><svg fill="none" height="16" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 16" width="20"><path d="M2 8h19m0 0-6-6m6 6-6 6"></path></svg></button></div></div>
 <div class="services-list" id="servicesList">
-<article class="service-card glass-card reveal" data-search="home cleaning cleaning home yacht marine"><div class="service-image"><img alt="Person vacuuming a bright living room." loading="lazy" src="assets/clino-photo-8055202.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Home Cleaning</h3><a aria-label="Call about Home Cleaning" class="service-link" href="tel:+15612754445"><svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17"><path d="M7 17 17 7M7 7h10v10"></path></svg></a></div></article>
-<article class="service-card glass-card reveal" data-search="kitchen cleaning cleaning home yacht marine"><div class="service-image"><img alt="Person wiping a kitchen counter." loading="lazy" src="assets/clino-photo-5591852.webp"/><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Kitchen Cleaning</h3><a aria-label="Call about Kitchen Cleaning" class="service-link" href="tel:+15612754445"><svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17"><path d="M7 17 17 7M7 7h10v10"></path></svg></a></div></article>
-<article class="service-card glass-card reveal" data-search="office cleaning cleaning home yacht marine"><div class="service-image"><img alt="Hand cleaning an office desk." loading="lazy" src="assets/clino-photo-9462092.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Office Cleaning</h3><a aria-label="Call about Office Cleaning" class="service-link" href="tel:+15612754445"><svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17"><path d="M7 17 17 7M7 7h10v10"></path></svg></a></div></article>
-<article class="service-card glass-card reveal" data-search="yacht deck &amp; teak cleaning home yacht marine"><div class="service-image"><img alt="Wooden details on a sailboat deck." loading="lazy" src="assets/clino-photo-997615.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Yacht Deck &amp; Teak</h3><a aria-label="Call about Yacht Deck &amp; Teak" class="service-link" href="tel:+15612754445"><svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17"><path d="M7 17 17 7M7 7h10v10"></path></svg></a></div></article>
-<article class="service-card glass-card reveal" data-search="yacht cabin interior cleaning home yacht marine"><div class="service-image"><img alt="Sailboat deck and rigging at the dock." loading="lazy" src="assets/clino-photo-4910361.webp"/><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Yacht Cabin Interior</h3><a aria-label="Call about Yacht Cabin Interior" class="service-link" href="tel:+15612754445"><svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17"><path d="M7 17 17 7M7 7h10v10"></path></svg></a></div></article>
-<article class="service-card glass-card reveal" data-search="yacht washdown boat exterior marine"><div class="service-image"><img alt="Boat hull and rigging beside the water." loading="lazy" src="assets/clino-photo-5718436.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Yacht Washdown</h3><a aria-label="Call about Yacht Washdown" class="service-link" href="tel:+15612754445"><svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17"><path d="M7 17 17 7M7 7h10v10"></path></svg></a></div></article>
-<article class="service-card glass-card reveal" data-search="stainless detailing cleaning home yacht marine"><div class="service-image"><img alt="Sailboat covered at a marina with mooring lines." loading="lazy" src="assets/clino-photo-12069378.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Stainless Detailing</h3><a aria-label="Call about Stainless Detailing" class="service-link" href="tel:+15612754445"><svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17"><path d="M7 17 17 7M7 7h10v10"></path></svg></a></div></article>
-<article class="service-card glass-card reveal" data-search="cabin refresh cleaning home yacht marine"><div class="service-image"><img alt="Bright seating inside a yacht." loading="lazy" src="assets/clino-photo-8356418.webp"/><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Cabin Refresh</h3><a aria-label="Call about Cabin Refresh" class="service-link" href="tel:+15612754445"><svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17"><path d="M7 17 17 7M7 7h10v10"></path></svg></a></div></article>
-<article class="service-card glass-card reveal" data-search="yacht exterior wash cleaning home yacht marine"><div class="service-image"><img alt="Boat viewed from above on the water." loading="lazy" src="assets/clino-photo-32962453.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Yacht Exterior Wash</h3><a aria-label="Call about Yacht Exterior Wash" class="service-link" href="tel:+15612754445"><svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17"><path d="M7 17 17 7M7 7h10v10"></path></svg></a></div></article>
-<article class="service-card glass-card reveal" data-search="carpet &amp; upholstery cleaning home yacht marine"><div class="service-image"><img alt="Vacuum cleaner lifting dust from a carpet." loading="lazy" src="assets/clino-photo-4107284.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Carpet &amp; Upholstery</h3><a aria-label="Call about Carpet &amp; Upholstery" class="service-link" href="tel:+15612754445"><svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17"><path d="M7 17 17 7M7 7h10v10"></path></svg></a></div></article>
-<article class="service-card glass-card reveal" data-search="cockpit detailing cleaning home yacht marine"><div class="service-image"><img alt="Yachts moored at a marina." loading="lazy" src="assets/clino-photo-730747.webp"/><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Cockpit Detailing</h3><a aria-label="Call about Cockpit Detailing" class="service-link" href="tel:+15612754445"><svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17"><path d="M7 17 17 7M7 7h10v10"></path></svg></a></div></article>
+<article class="service-card glass-card reveal" data-search="home cleaning cleaning home yacht marine"><div class="service-image"><img alt="Person vacuuming a bright living room." loading="lazy" src="assets/clino-photo-8055202.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Home Cleaning</h3><a aria-label="Call about Home Cleaning" class="service-link" href="tel:+15612754445"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>
+<article class="service-card glass-card reveal" data-search="kitchen cleaning cleaning home yacht marine"><div class="service-image"><img alt="Person wiping a kitchen counter." loading="lazy" src="assets/clino-photo-5591852.webp"/><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Kitchen Cleaning</h3><a aria-label="Call about Kitchen Cleaning" class="service-link" href="tel:+15612754445"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>
+<article class="service-card glass-card reveal" data-search="office cleaning cleaning home yacht marine"><div class="service-image"><img alt="Hand cleaning an office desk." loading="lazy" src="assets/clino-photo-9462092.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Office Cleaning</h3><a aria-label="Call about Office Cleaning" class="service-link" href="tel:+15612754445"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>
+<article class="service-card glass-card reveal" data-search="yacht deck &amp; teak cleaning home yacht marine"><div class="service-image"><img alt="Wooden details on a sailboat deck." loading="lazy" src="assets/clino-photo-997615.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Yacht Deck &amp; Teak</h3><a aria-label="Call about Yacht Deck &amp; Teak" class="service-link" href="tel:+15612754445"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>
+<article class="service-card glass-card reveal" data-search="yacht cabin interior cleaning home yacht marine"><div class="service-image"><img alt="Sailboat deck and rigging at the dock." loading="lazy" src="assets/clino-photo-4910361.webp"/><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Yacht Cabin Interior</h3><a aria-label="Call about Yacht Cabin Interior" class="service-link" href="tel:+15612754445"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>
+<article class="service-card glass-card reveal" data-search="yacht washdown boat exterior marine"><div class="service-image"><img alt="Boat hull and rigging beside the water." loading="lazy" src="assets/clino-photo-5718436.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Yacht Washdown</h3><a aria-label="Call about Yacht Washdown" class="service-link" href="tel:+15612754445"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>
+<article class="service-card glass-card reveal" data-search="stainless detailing cleaning home yacht marine"><div class="service-image"><img alt="Sailboat covered at a marina with mooring lines." loading="lazy" src="assets/clino-photo-12069378.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Stainless Detailing</h3><a aria-label="Call about Stainless Detailing" class="service-link" href="tel:+15612754445"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>
+<article class="service-card glass-card reveal" data-search="cabin refresh cleaning home yacht marine"><div class="service-image"><img alt="Bright seating inside a yacht." loading="lazy" src="assets/clino-photo-8356418.webp"/><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Cabin Refresh</h3><a aria-label="Call about Cabin Refresh" class="service-link" href="tel:+15612754445"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>
+<article class="service-card glass-card reveal" data-search="yacht exterior wash cleaning home yacht marine"><div class="service-image"><img alt="Boat viewed from above on the water." loading="lazy" src="assets/clino-photo-32962453.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Yacht Exterior Wash</h3><a aria-label="Call about Yacht Exterior Wash" class="service-link" href="tel:+15612754445"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>
+<article class="service-card glass-card reveal" data-search="carpet &amp; upholstery cleaning home yacht marine"><div class="service-image"><img alt="Vacuum cleaner lifting dust from a carpet." loading="lazy" src="assets/clino-photo-4107284.webp"/><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Carpet &amp; Upholstery</h3><a aria-label="Call about Carpet &amp; Upholstery" class="service-link" href="tel:+15612754445"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>
+<article class="service-card glass-card reveal" data-search="cockpit detailing cleaning home yacht marine"><div class="service-image"><img alt="Yachts moored at a marina." loading="lazy" src="assets/clino-photo-730747.webp"/><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Cockpit Detailing</h3><a aria-label="Call about Cockpit Detailing" class="service-link" href="tel:+15612754445"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>
 <article class="service-card glass-card reveal" data-search="deep cleaning bathroom kitchen home"><div class="service-image"><img alt="Man cleaning shower glass in a tiled bathroom." loading="lazy" src="assets/clino-photo-3867600.webp"/></div><div class="service-meta"><h3>Deep Cleaning</h3><a aria-label="Call about Deep Cleaning" class="service-link" href="tel:+15612754445"><span aria-hidden="true">↗</span></a></div></article><article class="service-card glass-card reveal" data-search="move in move out realtors property managers"><div class="service-image"><img alt="Resident moving boxes into a new home." loading="lazy" src="assets/clino-photo-7464682.webp"/></div><div class="service-meta"><h3>Move-In / Move-Out</h3><a aria-label="Call about Move-In / Move-Out" class="service-link" href="tel:+15612754445"><span aria-hidden="true">↗</span></a></div></article><article class="service-card glass-card reveal" data-search="airbnb short term rental cleaning"><div class="service-image"><img alt="Guest-room supplies arranged for a short-term rental." loading="lazy" src="assets/clino-photo-7218504.webp"/></div><div class="service-meta"><h3>Airbnb Turnover</h3><a aria-label="Call about Airbnb Turnover" class="service-link" href="tel:+15612754445"><span aria-hidden="true">↗</span></a></div></article><article class="service-card glass-card reveal" data-search="weekly biweekly monthly recurring home cleaning"><div class="service-image"><img alt="Woman mopping a wood floor at home." loading="lazy" src="assets/clino-photo-7513164.webp"/></div><div class="service-meta"><h3>Recurring Cleaning</h3><a aria-label="Call about Recurring Cleaning" class="service-link" href="tel:+15612754445"><span aria-hidden="true">↗</span></a></div></article><article class="service-card glass-card reveal" data-search="post construction cleanup renovation business"><div class="service-image"><img alt="Workers preparing a renovated property for cleaning." loading="lazy" src="assets/clino-photo-6196239.webp"/></div><div class="service-meta"><h3>Post-Construction</h3><a aria-label="Call about Post-Construction" class="service-link" href="tel:+15612754445"><span aria-hidden="true">↗</span></a></div></article><article class="service-card glass-card reveal" data-search="disinfection commercial office cleaning"><div class="service-image"><img alt="Cleaner mopping an office floor." loading="lazy" src="assets/clino-photo-6195118.webp"/></div><div class="service-meta"><h3>Disinfection</h3><a aria-label="Call about Disinfection" class="service-link" href="tel:+15612754445"><span aria-hidden="true">↗</span></a></div></article></div><div aria-label="Choose a service slide" class="carousel-dots" id="serviceDots"></div>
 </div>
 </section>
@@ -507,6 +516,7 @@
     window.addEventListener('resize', updateServiceDot);
     updateServiceDot();
     const yachtHeroSlides = [
+      ['assets/clino-photo-5416343.webp', 'Worker cleaning a teak yacht deck by hand'],
       ['assets/clino-photo-17418154.webp', 'Quiet seating beside the windows in a yacht cabin'],
       ['assets/clino-photo-14730307.webp', 'A calm view of the sea from a boat cockpit'],
       ['assets/clino-photo-6263742.webp', 'Yacht bridge controls and navigation equipment'],
@@ -515,27 +525,28 @@
       ['assets/clino-photo-18488011.webp', 'Sea and sailboats framed by a ship porthole'],
       ['assets/clino-photo-4934632.webp', 'Sailors navigating a yacht under a bridge']
     ];
-    const heroImages = [...document.querySelectorAll('[data-hero-slide]')];
-    let activeHero = 0;
+    const heroImage = document.querySelector('[data-hero-slide]');
     let activeSlide = 0;
-    if (!matchMedia('(prefers-reduced-motion: reduce)').matches && heroImages.length === 2) {
+    let heroSwapInProgress = false;
+    if (heroImage && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       window.setInterval(() => {
-        if (document.hidden) return;
-        const nextHero = 1 - activeHero;
-        const image = heroImages[nextHero];
-        const slide = yachtHeroSlides[(activeSlide + 1) % yachtHeroSlides.length];
+        if (document.hidden || heroSwapInProgress) return;
+        const nextIndex = (activeSlide + 1) % yachtHeroSlides.length;
+        const [nextSource, nextAlt] = yachtHeroSlides[nextIndex];
         const preload = new Image();
+        heroSwapInProgress = true;
         preload.onload = () => {
-          image.src = slide[0];
-          image.alt = slide[1];
-          image.classList.add('is-current');
-          image.setAttribute('aria-hidden', 'false');
-          heroImages[activeHero].classList.remove('is-current');
-          heroImages[activeHero].setAttribute('aria-hidden', 'true');
-          activeHero = nextHero;
-          activeSlide = (activeSlide + 1) % yachtHeroSlides.length;
+          heroImage.classList.add('is-changing');
+          window.setTimeout(() => {
+            heroImage.src = nextSource;
+            heroImage.alt = nextAlt;
+            heroImage.classList.remove('is-changing');
+            activeSlide = nextIndex;
+            heroSwapInProgress = false;
+          }, 230);
         };
-        preload.src = slide[0];
+        preload.onerror = () => { heroSwapInProgress = false; };
+        preload.src = nextSource;
       }, 5000);
     }
     const avatarTrack = document.querySelector('.client-faces');
@@ -592,7 +603,7 @@
       }
       gsap.registerPlugin(ScrollTrigger);
       gsap.from('.hero-copy > *', { y: 18, opacity: 0, duration: .72, stagger: .075, ease: 'power2.out' });
-      gsap.from('.hero-kit.is-current', { y: 24, scale: .97, opacity: 0, duration: .9, delay: .12, ease: 'power2.out' });
+      gsap.from('.hero-kit', { y: 24, scale: .97, opacity: 0, duration: .9, delay: .12, ease: 'power2.out' });
 
       const headingTargets = gsap.utils.toArray('.hero-title, .section-heading, .quote-band h2');
       headingTargets.forEach((heading, index) => {

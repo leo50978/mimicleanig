@@ -1,6 +1,6 @@
 # Photo credits
 
-The website uses real Pexels stock photographs stored locally as WebP files. Every image placement has its own source photograph; no photo is reused across pages or the homepage yacht carousel. The people shown are illustrative and are not identified as Clino employees or customers.
+The website uses real Pexels stock photographs stored locally as WebP files. Every image placement has its own source photograph; no photo is reused across pages or the homepage yacht carousel. The people shown are illustrative and are not identified as Clino employees or customers. The homepage client portrait strip uses stock portraits for illustration only; it does not identify actual customers.
 
 Pexels allows free use of its photos on websites; attribution is appreciated but not required. Photos must not imply endorsement by the people shown: [Pexels license](https://www.pexels.com/license/).
 
@@ -76,3 +76,14 @@ Each ID corresponds to its original Pexels photograph and to a unique local file
 - 37701841
 - 38767972
 - 38936521
+
+## Portrait source photo IDs
+
+Each portrait is a unique Pexels photograph stored as `assets/clino-client-ID.webp`; portraits are illustrative and do not identify actual Clino customers.
+
+- 12644996
+- 16041479
+- 30004315
+- 37600418
+- 38889899
+- 7624514
