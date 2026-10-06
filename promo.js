@@ -50,7 +50,7 @@ async function generateFilm() {
       gradient.addColorStop(0,'rgba(13,26,64,0)'); gradient.addColorStop(1,'rgba(13,26,64,.78)');
       ctx.fillStyle = gradient; ctx.fillRect(0,250,960,290);
       ctx.fillStyle = '#b8f4ff'; ctx.font = '800 18px Nunito Sans, sans-serif'; ctx.fillText('FLORIDA HOME & YACHT CLEANING', 54, 423);
-      ctx.fillStyle = '#ffffff'; ctx.font = '700 43px "Lilita One", sans-serif'; ctx.fillText(['Every detail, cared for.','Fresh spaces, ready to enjoy.','A clearer view, on the water.','Polished with a lighter touch.','A calm cabin starts here.','A brighter boat, inside and out.','Make room for a perfect day.'][slide], 54, 474);
+      ctx.fillStyle = '#ffffff'; ctx.font = '700 43px "DM Sans", sans-serif'; ctx.fillText(['Every detail, cared for.','Fresh spaces, ready to enjoy.','A clearer view, on the water.','Polished with a lighter touch.','A calm cabin starts here.','A brighter boat, inside and out.','Make room for a perfect day.'][slide], 54, 474);
       if (elapsed < duration * images.length) requestAnimationFrame(draw); else recorder.stop();
     };
     requestAnimationFrame(draw);
