@@ -29,6 +29,7 @@
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; scroll-padding-top: 90px; }
     body { margin: 0; color: var(--ink); background: var(--pale); font-family: var(--body); overflow-x: hidden; }
+    body.menu-open { overflow: hidden; }
     img { display: block; max-width: 100%; }
     a { color: inherit; text-decoration: none; }
     button, input, select { font: inherit; }
@@ -70,13 +71,15 @@
     .client-proof { display: flex; align-items: center; gap: 13px; margin-top: 34px; font-size: 12px; font-weight: 900; }
     .client-faces { display: flex; align-items: center; padding-left: 3px; }
     .client-faces span { width: 33px; height: 33px; margin-left: -4px; border: 2px solid #f3f8ff; border-radius: 50%; display: grid; place-items: center; background: #fff; color: var(--blue-deep); font-size: 8px; font-weight: 900; }
+    .client-faces img { position: relative; width: 36px; height: 36px; margin-left: -7px; border: 2px solid #f3f8ff; border-radius: 50%; object-fit: cover; background: #fff; }
+    .client-faces img:first-child { margin-left: -4px; }
     .client-faces span:nth-child(2) { background: #c8f4f5; }
     .client-faces span:nth-child(3) { background: #ffdbb5; }
     .client-faces span:nth-child(4) { background: #d7d1ff; }
     .client-faces span:last-child { width: 37px; height: 37px; background: var(--blue); color: #fff; font-size: 9px; }
     .hero-stats { display: flex; gap: 15px; margin-top: 21px; }
     .hero-stat { min-width: 150px; padding: 10px 17px; border-radius: 15px; display: flex; align-items: center; gap: 7px; background: #fff; box-shadow: 0 12px 35px #3b5cae10; }
-    .hero-stat strong { color: var(--blue); font: 700 26px/1 var(--display); }
+    .hero-stat strong { display: inline-block; min-width: 4.6ch; color: var(--blue); font: 700 26px/1 var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
     .hero-stat span { max-width: 72px; font-size: 10px; font-weight: 900; line-height: 1.2; }
     .hero-art { position: relative; align-self: stretch; display: grid; place-items: center; min-width: 0; margin: -10px -47px -46px -28px; }
     .hero-art:before { content: ''; position: absolute; width: min(95%, 525px); aspect-ratio: 1; top: 12%; right: -1%; border-radius: 50%; background: radial-gradient(circle, #baf6f5a6 0 33%, #ffffff00 70%); }
@@ -85,7 +88,7 @@
     .bubble-one { width: 14px; height: 14px; left: 1%; top: 26%; }
     .bubble-two { width: 8px; height: 8px; left: 5%; top: 32%; background: #9ab2f2; border: 0; }
     .feature-row { position: relative; z-index: 5; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: -43px; }
-    .feature-card { min-height: 154px; padding: 27px 33px; border-radius: 24px; background: #ffffffee; box-shadow: 0 18px 42px #273b7920; }
+    .feature-card { min-height: 154px; padding: 27px 33px; border-radius: 24px; box-shadow: 0 18px 42px #273b7920; }
     .feature-icon { width: 34px; height: 34px; margin-bottom: 9px; color: #6682d6; }
     .feature-card h3 { margin: 0 0 4px; font-size: 18px; letter-spacing: 0; }
     .feature-card p { max-width: 260px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
@@ -98,6 +101,7 @@
     .mosaic-lower { left: 37%; top: 47%; width: 58%; height: 48%; border-radius: 24px; }
     .years-card { position: absolute; z-index: 2; left: 10%; bottom: 0; width: 130px; height: 130px; border-radius: 24px; display: grid; align-content: center; justify-items: center; background: var(--blue); color: #fff; box-shadow: 0 18px 35px #6581f455; text-align: center; }
     .years-card strong { font: 700 38px/.95 var(--display); }
+    .years-card strong[data-count] { min-width: 3.5ch; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .years-card span { width: 75px; margin-top: 6px; font-size: 11px; font-weight: 800; line-height: 1.2; }
     .section-heading { margin: 15px 0 16px; font-size: clamp(30px, 2.9vw, 38px); line-height: 1.04; }
     .section-copy { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.8; text-align: justify; }
@@ -105,6 +109,7 @@
     .about-stat { padding-right: 9px; border-right: 1px solid #dce1ef; }
     .about-stat:last-child { border-right: 0; }
     .about-stat strong { display: block; color: var(--blue); font: 700 24px/1 var(--display); }
+    .about-stat strong[data-count] { min-width: 5.3ch; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .about-stat span { display: block; margin-top: 4px; font-size: 11px; font-weight: 900; line-height: 1.25; }
     .signature { margin-top: 18px; color: #5b5b72; font: italic 500 25px/1.2 var(--display); }
     .signature small { display: block; margin-top: 4px; color: var(--ink); font: 900 10px/1.4 var(--body); }
@@ -118,7 +123,7 @@
     .carousel-arrow { width: 56px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 999px; background: #fff; color: var(--blue-deep); transition: background .2s, color .2s; }
     .carousel-arrow:hover { background: var(--blue); color: #fff; }
     .services-list { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
-    .service-card { min-width: 0; overflow: hidden; padding: 12px; border-radius: 22px; background: #ffffffdc; box-shadow: 0 15px 35px #415b9d12; }
+    .service-card { min-width: 0; overflow: hidden; padding: 12px; border-radius: 22px; box-shadow: 0 15px 35px #415b9d12; }
     .service-image { position: relative; overflow: hidden; height: 226px; border-radius: 17px; background: #d9e8f6; }
     .service-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
     .service-card:hover .service-image img { transform: scale(1.04); }
@@ -151,8 +156,8 @@
     .price-intro .section-heading { max-width: 470px; margin-bottom: 0; }
     .price-intro p { max-width: 360px; margin: 0 0 4px; color: #7d879b; font-size: 14px; line-height: 1.7; }
     .plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
-    .plan { min-width: 0; padding: 27px 29px 25px; border-radius: 22px; background: #fff; box-shadow: 0 15px 35px #304e9620; }
-    .plan:nth-child(2) { background: #f4fbff; }
+    .plan { min-width: 0; padding: 27px 29px 25px; border-radius: 22px; box-shadow: 0 15px 35px #304e9620; }
+    .plan:nth-child(2) { border-color: #bfe2ff; }
     .plan h3 { margin: 0 0 12px; text-align: center; font-size: 19px; letter-spacing: 0; }
     .plan-price { display: flex; align-items: baseline; justify-content: center; gap: 4px; margin-bottom: 21px; white-space: nowrap; }
     .plan-price span { color: var(--blue); font: 700 26px/1 var(--display); }
@@ -192,7 +197,17 @@
     .footer-bottom { display: flex; justify-content: space-between; gap: 18px; margin-top: 66px; padding-top: 19px; border-top: 1px solid #ffffff20; color: #b5bddc; font-size: 11px; }
     .toast { position: fixed; z-index: 60; right: 20px; bottom: 20px; max-width: min(390px, calc(100vw - 40px)); padding: 13px 17px; border-radius: 12px; background: var(--night); color: #fff; font-size: 13px; box-shadow: 0 12px 35px #111b4950; opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity .2s, transform .2s; }
     .toast.show { opacity: 1; transform: translateY(0); }
-    .reveal { opacity: 0; transform: translateY(24px); }
+    .glass-card { position: relative; isolation: isolate; overflow: hidden; border: 1px solid #ffffffb8; background: linear-gradient(140deg, #ffffffc9 0%, #ffffff76 54%, #eef6ff70 100%); -webkit-backdrop-filter: blur(24px) saturate(165%); backdrop-filter: blur(24px) saturate(165%); box-shadow: 0 18px 42px #273b791b, inset 0 1px 0 #ffffffd9, inset 0 -1px 0 #ffffff66; }
+    .glass-card::before { content: ''; position: absolute; z-index: 0; inset: 0 0 auto; height: 54%; border-radius: inherit; background: linear-gradient(175deg, #ffffffa8 0%, #ffffff45 36%, #ffffff00 100%); pointer-events: none; }
+    .glass-card > * { position: relative; z-index: 1; }
+    .hero-stat.glass-card { box-shadow: 0 12px 35px #3b5cae12, inset 0 1px 0 #ffffffd9; }
+    .service-card.glass-card { background: linear-gradient(140deg, #ffffffca, #f8fbff9a); }
+    .reveal { opacity: 0; transform: translateY(24px); will-change: transform, opacity; }
+    .nav-backdrop { display: none; }
+    .nav-backdrop[hidden] { display: none !important; }
+    .menu-close { display: none; }
+    .letter-word { display: inline-block; white-space: nowrap; }
+    .letter-char { display: inline-block; white-space: pre; }
     @media (max-width: 960px) {
       .wrap { width: min(100% - 40px, 780px); }
       .nav { gap: 18px; }
@@ -215,9 +230,12 @@
       .nav { height: 72px; }
       .brand { font-size: 25px; }
       .menu-button { display: grid; place-items: center; }
-      .nav-links { position: absolute; top: 64px; left: 18px; right: 18px; display: none; flex-direction: column; align-items: stretch; gap: 0; margin: 0; padding: 12px 18px; border: 1px solid #e9edfa; border-radius: 16px; background: #fff; box-shadow: 0 15px 40px #273b7919; }
-      .nav-links.open { display: flex; }
-      .nav-links a { padding: 12px 0; border-bottom: 1px solid #eef0f7; }
+      .nav-backdrop { position: fixed; inset: 0; z-index: 1; display: block; width: 100%; height: 100dvh; padding: 0; border: 0; background: #10173370; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility .3s linear .38s; }
+      .nav-backdrop.open { opacity: 1; visibility: visible; transition-delay: 0s; }
+      .nav-links { position: fixed; z-index: 2; top: 0; right: 0; left: auto; display: flex; flex-direction: column; align-items: stretch; gap: 0; width: 50vw; height: 120vh; height: 120dvh; margin: 0; padding: max(22px, env(safe-area-inset-top)) 20px 40px; border: 1px solid #ffffffbd; border-right: 0; border-radius: 28px 0 0 28px; background: linear-gradient(150deg, #ffffffd9 0%, #f6f8ffd0 48%, #dffaffc9 100%); -webkit-backdrop-filter: blur(34px) saturate(175%); backdrop-filter: blur(34px) saturate(175%); box-shadow: -24px 0 75px #141d3f38, inset 1px 0 0 #ffffffd9, inset 0 1px 0 #ffffffd9; transform: translateX(105%); visibility: hidden; transition: transform .48s cubic-bezier(.2,.85,.25,1), visibility 0s linear .48s; }
+      .nav-links.open { transform: translateX(0); visibility: visible; transition-delay: 0s; }
+      .menu-close { width: 42px; height: 42px; flex: none; align-self: end; margin: 0 -8px 26px 0; padding: 0; border: 1px solid #ffffffb8; border-radius: 50%; display: grid; place-items: center; color: var(--ink); background: #ffffffa6; box-shadow: inset 0 1px 0 #fff, 0 8px 18px #26396b16; }
+      .nav-links a { padding: 15px 2px; border-bottom: 1px solid #ffffff9c; font-size: 13px; }
       .nav-links a:last-child { border: 0; }
       .nav-tools { margin-left: auto; }
       .nav-tools > .button { padding: 11px 16px; }
@@ -267,6 +285,8 @@
       .search-button { width: 34px; height: 34px; }
       .nav-tools > .button { min-height: 38px; padding: 9px 11px; font-size: 10px; }
       .menu-button { padding: 5px; }
+      .nav-links { padding-inline: 15px; border-radius: 23px 0 0 23px; }
+      .menu-close { margin-bottom: 22px; }
       .hero-ctas { gap: 12px; }
       .hero-stats { gap: 9px; }
       .hero-stat { min-width: 0; flex: 1; padding: 10px 12px; }
@@ -284,6 +304,7 @@
       html { scroll-behavior: auto; }
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
       .reveal { opacity: 1; transform: none; }
+      .nav-links, .nav-backdrop { transition-duration: .01ms !important; }
     }
   </style>
 </head>
@@ -294,14 +315,15 @@
         <svg class="brand-icon" viewBox="0 0 28 32" fill="none" aria-hidden="true"><path d="M10 2.5a1.7 1.7 0 1 1 0 3.4 1.7 1.7 0 0 1 0-3.4ZM18 5.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" fill="currentColor"/><path d="M4.5 9h18v18.2c0 1.1-.9 2-2 2h-14c-1.1 0-2-.9-2-2V9Z" fill="currentColor"/><path d="M9 14.5v5.2M18 14.5v5.2M8 23c3.6 2.4 7.4 2.4 11 0" stroke="#211c37" stroke-width="1.6" stroke-linecap="round"/></svg>
         <span>Clino</span>
       </a>
-      <div class="nav-links" id="navLinks"><a href="#home" aria-current="page">Home</a><a href="#about">About Us</a><a href="#services">Services</a><a href="#services">Testimonial</a><a href="#plans">Blog</a></div>
+      <div class="nav-links" id="navLinks"><button class="menu-close" id="menuClose" type="button" aria-label="Close menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg></button><a href="#home" aria-current="page">Home</a><a href="#about">About Us</a><a href="#services">Services</a><a href="#services">Testimonial</a><a href="#plans">Blog</a></div>
       <div class="nav-tools">
         <button class="search-button" id="searchButton" aria-label="Search services" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></button>
         <a class="button" href="#contact">Contact Us</a>
-        <button class="menu-button" id="menuButton" aria-label="Open menu" aria-expanded="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <button class="menu-button" id="menuButton" type="button" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       </div>
       <form class="search-panel" id="searchPanel" role="search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="searchInput" type="search" placeholder="Find a cleaning service" aria-label="Find a cleaning service"></form>
     </nav>
+    <button class="nav-backdrop" id="navBackdrop" type="button" aria-label="Close menu" tabindex="-1" hidden></button>
   </header>
   <main>
     <section class="hero-shell" id="home">
@@ -311,44 +333,44 @@
           <h1 class="hero-title">Feel your way<br>for freshness</h1>
           <p>Experience the epitome of cleanliness with Clino. We provide top-notch cleaning services tailored to your needs, ensuring your spaces shine with perfection.</p>
           <div class="hero-ctas"><a class="button button-services" href="#services">Our Services <span class="round-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m15 3 6 6M4 20l3.5-.7L19 7l-2-2L5.5 16.5 4 20Z"/><path d="m8 17 2 2"/></svg></span></a><a class="play-button" href="#why" aria-label="Learn how Clino works"><svg width="13" height="15" viewBox="0 0 12 14" fill="currentColor" aria-hidden="true"><path d="M11 7 1 13V1l10 6Z"/></svg></a><span class="play-label">How it works</span></div>
-          <div class="client-proof"><div class="client-faces" aria-hidden="true"><span>AS</span><span>JM</span><span>KL</span><span>MR</span><span>+65</span></div><span>Our VIP Clients</span></div>
-          <div class="hero-stats"><div class="hero-stat"><strong>800+</strong><span>Happy Clients</span></div><div class="hero-stat"><strong>180+</strong><span>Awards Received</span></div></div>
+          <div class="client-proof"><div class="client-faces" aria-label="Clino clients"><img src="assets/clino-client-amara.webp" alt="" width="36" height="36"><img src="assets/clino-client-raj.webp" alt="" width="36" height="36"><img src="assets/clino-client-lucia.webp" alt="" width="36" height="36"><img src="assets/clino-client-owen.webp" alt="" width="36" height="36"><span aria-label="65 more clients">+65</span></div><span>Our VIP Clients</span></div>
+          <div class="hero-stats"><div class="hero-stat glass-card"><strong data-count="800" data-suffix="+">800+</strong><span>Happy Clients</span></div><div class="hero-stat glass-card"><strong data-count="180" data-suffix="+">180+</strong><span>Awards Received</span></div></div>
         </div>
         <div class="hero-art"><span class="bubble bubble-one"></span><span class="bubble bubble-two"></span><img class="hero-kit" src="assets/clino-kit.webp" alt="Bright blue bucket filled with colorful cleaning supplies"></div>
       </div>
     </section>
     <div class="feature-row wrap" aria-label="Why customers choose Clino">
-      <article class="feature-card reveal"><svg class="feature-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="13" cy="11" r="4"/><circle cx="26" cy="11" r="4"/><path d="M4.5 29v-7a5 5 0 0 1 5-5h7a5 5 0 0 1 5 5v7M18.5 19a5 5 0 0 1 4.5-3h4a5 5 0 0 1 5 5v5M10 22v10m9-10v10m4-9v7m7-7v7"/></svg><h3>Expert Team</h3><p>Our highly trained professionals bring a wealth of experience.</p></article>
-      <article class="feature-card reveal"><svg class="feature-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 31 11-24 12 24M11 20h13M5 32h28M25 9l7 4v13M28 17h4"/><circle cx="31" cy="8" r="2"/></svg><h3>Quality Service</h3><p>We guarantee a spotless finish that exceeds your expectations.</p></article>
-      <article class="feature-card reveal"><svg class="feature-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m4 17 16-12 16 12-16 18L4 17Z"/><circle cx="13" cy="16" r="2"/><path d="m23 11 10 8M10 23l9 8"/></svg><h3>Affordable Price</h3><p>Exceptional services at prices that are affordable for everyone.</p></article>
+      <article class="feature-card glass-card reveal"><svg class="feature-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="13" cy="11" r="4"/><circle cx="26" cy="11" r="4"/><path d="M4.5 29v-7a5 5 0 0 1 5-5h7a5 5 0 0 1 5 5v7M18.5 19a5 5 0 0 1 4.5-3h4a5 5 0 0 1 5 5v5M10 22v10m9-10v10m4-9v7m7-7v7"/></svg><h3>Expert Team</h3><p>Our highly trained professionals bring a wealth of experience.</p></article>
+      <article class="feature-card glass-card reveal"><svg class="feature-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 31 11-24 12 24M11 20h13M5 32h28M25 9l7 4v13M28 17h4"/><circle cx="31" cy="8" r="2"/></svg><h3>Quality Service</h3><p>We guarantee a spotless finish that exceeds your expectations.</p></article>
+      <article class="feature-card glass-card reveal"><svg class="feature-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m4 17 16-12 16 12-16 18L4 17Z"/><circle cx="13" cy="16" r="2"/><path d="m23 11 10 8M10 23l9 8"/></svg><h3>Affordable Price</h3><p>Exceptional services at prices that are affordable for everyone.</p></article>
     </div>
     <section class="section" id="about">
       <div class="about-grid wrap">
-        <div class="mosaic reveal"><img class="mosaic-main" src="assets/clino-floor.webp" alt="Cleaner mopping a bright kitchen floor" loading="lazy"><img class="mosaic-round" src="assets/clino-glass.webp" alt="Yellow-gloved hand polishing a window" loading="lazy"><img class="mosaic-lower" src="assets/clino-team.webp" alt="Professional Clino cleaners ready to work" loading="lazy"><div class="years-card"><strong>16+</strong><span>Successful Years</span></div></div>
-        <div class="about-copy reveal"><span class="tag">About Us</span><h2 class="section-heading">We Make Places Clean &amp; Bright</h2><p class="section-copy">At Clino, we’re dedicated to transforming your living and working spaces into pristine havens. With years of experience and a passion for cleanliness, we strive to exceed your expectations every time.</p><div class="about-stats"><div class="about-stat"><strong>1000+</strong><span>Project Completed</span></div><div class="about-stat"><strong>123+</strong><span>Expert Cleaners</span></div><div class="about-stat"><strong>400+</strong><span>Repeat Clients</span></div></div><div class="signature">Clino Care Team<small>Professional cleaning, with care</small></div></div>
+        <div class="mosaic reveal"><img class="mosaic-main" src="assets/clino-floor.webp" alt="Cleaner mopping a bright kitchen floor" loading="lazy"><img class="mosaic-round" src="assets/clino-glass.webp" alt="Yellow-gloved hand polishing a window" loading="lazy"><img class="mosaic-lower" src="assets/clino-team.webp" alt="Professional Clino cleaners ready to work" loading="lazy"><div class="years-card"><strong data-count="16" data-suffix="+">16+</strong><span>Successful Years</span></div></div>
+        <div class="about-copy reveal"><span class="tag">About Us</span><h2 class="section-heading">We Make Places Clean &amp; Bright</h2><p class="section-copy">At Clino, we’re dedicated to transforming your living and working spaces into pristine havens. With years of experience and a passion for cleanliness, we strive to exceed your expectations every time.</p><div class="about-stats"><div class="about-stat"><strong data-count="1000" data-suffix="+">1000+</strong><span>Project Completed</span></div><div class="about-stat"><strong data-count="123" data-suffix="+">123+</strong><span>Expert Cleaners</span></div><div class="about-stat"><strong data-count="400" data-suffix="+">400+</strong><span>Repeat Clients</span></div></div><div class="signature">Clino Care Team<small>Professional cleaning, with care</small></div></div>
       </div>
     </section>
     <section class="services-section section" id="services">
       <div class="wrap"><div class="section-topline"><div><span class="tag">Our Services</span><h2 class="section-heading">Elevate your space<br>with our service</h2></div><div class="carousel-controls"><button class="carousel-arrow" id="servicePrev" aria-label="Previous services"><svg width="20" height="16" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 8H3m0 0 6-6M3 8l6 6"/></svg></button><button class="carousel-arrow" id="serviceNext" aria-label="Next services"><svg width="20" height="16" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8h19m0 0-6-6m6 6-6 6"/></svg></button></div></div>
         <div class="services-list" id="servicesList">
-          <article class="service-card reveal" data-search="home cleaning house home residential"><div class="service-image"><img src="assets/clino-floor.webp" alt="Mopping a spotless home floor" loading="lazy"><span class="rating">4.7 ★</span></div><div class="service-meta"><h3>Home Cleaning</h3><a class="service-link" href="#plans" aria-label="View home cleaning plans"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
-          <article class="service-card reveal" data-search="kitchen cleaning kitchen home"><div class="service-image"><img src="assets/clino-team.webp" alt="Cleaning team preparing a kitchen for service" loading="lazy"><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Kitchen Cleaning</h3><a class="service-link" href="#plans" aria-label="View kitchen cleaning plans"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
-          <article class="service-card reveal" data-search="office cleaning office workplace commercial"><div class="service-image"><img src="assets/clino-office.webp" alt="Professional cleaning in a modern office" loading="lazy"><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Office Cleaning</h3><a class="service-link" href="#plans" aria-label="View office cleaning plans"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="home cleaning house home residential"><div class="service-image"><img src="assets/clino-floor.webp" alt="Mopping a spotless home floor" loading="lazy"><span class="rating">4.7 ★</span></div><div class="service-meta"><h3>Home Cleaning</h3><a class="service-link" href="#plans" aria-label="View home cleaning plans"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="kitchen cleaning kitchen home"><div class="service-image"><img src="assets/clino-team.webp" alt="Cleaning team preparing a kitchen for service" loading="lazy"><span class="rating">5.0 ★</span></div><div class="service-meta"><h3>Kitchen Cleaning</h3><a class="service-link" href="#plans" aria-label="View kitchen cleaning plans"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
+          <article class="service-card glass-card reveal" data-search="office cleaning office workplace commercial"><div class="service-image"><img src="assets/clino-office.webp" alt="Professional cleaning in a modern office" loading="lazy"><span class="rating">4.9 ★</span></div><div class="service-meta"><h3>Office Cleaning</h3><a class="service-link" href="#plans" aria-label="View office cleaning plans"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a></div></article>
         </div><div class="carousel-dots" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
       </div>
     </section>
     <section class="section" id="why">
       <div class="choose-grid wrap">
         <div class="choose-copy reveal"><span class="tag">Choose</span><h2 class="section-heading">Why Choose Clino<br>Cleaning Services</h2><p class="section-copy">With Clino, you’re not just getting a cleaning service; you’re gaining a partner in cleanliness. Here’s why clients trust us:</p><ul class="check-list"><li><span class="check-icon"><svg width="10" height="9" viewBox="0 0 12 10" fill="none"><path d="m1 5 3 3 7-7" stroke="currentColor" stroke-width="1.7"/></svg></span>Our team comprises skilled professionals committed to care.</li><li><span class="check-icon"><svg width="10" height="9" viewBox="0 0 12 10" fill="none"><path d="m1 5 3 3 7-7" stroke="currentColor" stroke-width="1.7"/></svg></span>Count on us to be there when you need us.</li><li><span class="check-icon"><svg width="10" height="9" viewBox="0 0 12 10" fill="none"><path d="m1 5 3 3 7-7" stroke="currentColor" stroke-width="1.7"/></svg></span>Your satisfaction is our priority.</li></ul><div class="choose-lower"><a class="mini-video" href="#services" aria-label="Explore our cleaning services"><img src="assets/clino-team.webp" alt="Clino cleaning professionals at work" loading="lazy"><span><svg width="13" height="15" viewBox="0 0 12 14" fill="currentColor"><path d="M11 7 1 13V1l10 6Z"/></svg></span></a><p>We use top-quality products and proven techniques to ensure superior cleanliness and hygiene.</p></div><a class="button" href="#services">Find Out More <span aria-hidden="true">↗</span></a></div>
-        <div class="choose-visual reveal"><img class="choose-wide" src="assets/clino-floor.webp" alt="Mopping a clean, sunlit floor" loading="lazy"><img class="choose-tall" src="assets/clino-team.webp" alt="Cleaner carefully wiping an office surface" loading="lazy"><div class="years-card choose-years"><strong>16+</strong><span>Successful Years</span></div></div>
+        <div class="choose-visual reveal"><img class="choose-wide" src="assets/clino-floor.webp" alt="Mopping a clean, sunlit floor" loading="lazy"><img class="choose-tall" src="assets/clino-team.webp" alt="Cleaner carefully wiping an office surface" loading="lazy"><div class="years-card choose-years"><strong data-count="16" data-suffix="+">16+</strong><span>Successful Years</span></div></div>
       </div>
     </section>
     <section class="price-section section" id="plans">
       <div class="wrap"><div class="price-intro"><div><span class="tag">Price Package</span><h2 class="section-heading">Choose Your Perfect<br>Clean</h2></div><p>Explore our range of meticulously curated cleaning packages designed to meet your unique needs.</p></div>
         <div class="plans">
-          <article class="plan reveal"><h3>Basic Plan</h3><div class="plan-price"><span>$</span><strong>30</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>Cleaning bathrooms</li><li><span class="check-icon">✓</span>Mopping floors</li><li><span class="check-icon">✓</span>Vacuuming carpets and rugs</li><li><span class="check-icon">✓</span>Dusting and wiping surfaces</li></ul><a class="button" href="#contact">Buy Plan</a></article>
-          <article class="plan reveal"><h3>Standard Plan</h3><div class="plan-price"><span>$</span><strong>70</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>All services from the basic</li><li><span class="check-icon">✓</span>Washing baseboards, molding</li><li><span class="check-icon">✓</span>Cleaning inside cabinets</li><li><span class="check-icon">✓</span>Cleaning inside drawers</li></ul><a class="button" href="#contact">Buy Plan</a></article>
-          <article class="plan reveal"><h3>Premium Plan</h3><div class="plan-price"><span>$</span><strong>120</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>All services from standard</li><li><span class="check-icon">✓</span>Cleaning inside closets</li><li><span class="check-icon">✓</span>Emptying trash bins</li><li><span class="check-icon">✓</span>High-touch surfaces</li></ul><a class="button" href="#contact">Buy Plan</a></article>
+          <article class="plan glass-card reveal"><h3>Basic Plan</h3><div class="plan-price"><span>$</span><strong>30</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>Cleaning bathrooms</li><li><span class="check-icon">✓</span>Mopping floors</li><li><span class="check-icon">✓</span>Vacuuming carpets and rugs</li><li><span class="check-icon">✓</span>Dusting and wiping surfaces</li></ul><a class="button" href="#contact">Buy Plan</a></article>
+          <article class="plan glass-card reveal"><h3>Standard Plan</h3><div class="plan-price"><span>$</span><strong>70</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>All services from the basic</li><li><span class="check-icon">✓</span>Washing baseboards, molding</li><li><span class="check-icon">✓</span>Cleaning inside cabinets</li><li><span class="check-icon">✓</span>Cleaning inside drawers</li></ul><a class="button" href="#contact">Buy Plan</a></article>
+          <article class="plan glass-card reveal"><h3>Premium Plan</h3><div class="plan-price"><span>$</span><strong>120</strong><small>monthly</small></div><ul><li><span class="check-icon">✓</span>All services from standard</li><li><span class="check-icon">✓</span>Cleaning inside closets</li><li><span class="check-icon">✓</span>Emptying trash bins</li><li><span class="check-icon">✓</span>High-touch surfaces</li></ul><a class="button" href="#contact">Buy Plan</a></article>
         </div>
       </div>
     </section>
@@ -365,16 +387,33 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
   <script>
     const menuButton = document.getElementById('menuButton');
+    const menuClose = document.getElementById('menuClose');
     const navLinks = document.getElementById('navLinks');
-    menuButton.addEventListener('click', () => {
-      const open = navLinks.classList.toggle('open');
+    const navBackdrop = document.getElementById('navBackdrop');
+    const mobileNavQuery = matchMedia('(max-width: 760px)');
+    navLinks.setAttribute('aria-hidden', String(mobileNavQuery.matches));
+    mobileNavQuery.addEventListener('change', event => {
+      if (event.matches) setMenuOpen(false, false);
+      navLinks.setAttribute('aria-hidden', String(event.matches));
+    });
+    function setMenuOpen(open, restoreFocus = true) {
+      navLinks.classList.toggle('open', open);
+      navBackdrop.classList.toggle('open', open);
+      navBackdrop.hidden = !open;
+      navLinks.setAttribute('aria-hidden', String(!open && mobileNavQuery.matches));
       menuButton.setAttribute('aria-expanded', String(open));
       menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.body.classList.toggle('menu-open', open);
+      if (open) menuClose.focus();
+      else if (restoreFocus) menuButton.focus();
+    }
+    menuButton.addEventListener('click', () => setMenuOpen(menuButton.getAttribute('aria-expanded') !== 'true'));
+    menuClose.addEventListener('click', () => setMenuOpen(false));
+    navBackdrop.addEventListener('click', () => setMenuOpen(false));
+    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenuOpen(false, false)));
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') setMenuOpen(false);
     });
-    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
-      navLinks.classList.remove('open');
-      menuButton.setAttribute('aria-expanded', 'false');
-    }));
     const searchButton = document.getElementById('searchButton');
     const searchPanel = document.getElementById('searchPanel');
     const searchInput = document.getElementById('searchInput');
@@ -411,15 +450,83 @@
       showToast('Thanks! Connect a mailing list to start collecting subscribers.');
       event.currentTarget.reset();
     });
+    function splitIntoWords(element) {
+      const accessibleText = element.innerText.replace(/\s+/g, ' ').trim();
+      element.setAttribute('aria-label', accessibleText);
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+      const textNodes = [];
+      while (walker.nextNode()) textNodes.push(walker.currentNode);
+      textNodes.forEach(node => {
+        const parts = node.textContent.split(/(\s+)/);
+        const fragment = document.createDocumentFragment();
+        parts.forEach(part => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) fragment.append(document.createTextNode(part));
+          else {
+            const word = document.createElement('span');
+            word.className = 'letter-word';
+            [...part].forEach(character => {
+              const letter = document.createElement('span');
+              letter.className = 'letter-char';
+              letter.setAttribute('aria-hidden', 'true');
+              letter.textContent = character;
+              word.append(letter);
+            });
+            fragment.append(word);
+          }
+        });
+        node.replaceWith(fragment);
+      });
+      return element.querySelectorAll('.letter-char');
+    }
     window.addEventListener('load', () => {
+      const counters = window.gsap ? document.querySelectorAll('[data-count]') : [];
+      const finishCounters = () => counters.forEach(counter => { counter.textContent = `${counter.dataset.count}${counter.dataset.suffix || ''}`; });
       if (!window.gsap || !window.ScrollTrigger || matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.querySelectorAll('.reveal').forEach(el => { el.style.opacity = 1; el.style.transform = 'none'; });
+        finishCounters();
         return;
       }
       gsap.registerPlugin(ScrollTrigger);
       gsap.from('.hero-copy > *', { y: 18, opacity: 0, duration: .72, stagger: .075, ease: 'power2.out' });
       gsap.from('.hero-kit', { y: 24, scale: .97, opacity: 0, duration: .9, delay: .12, ease: 'power2.out' });
-      gsap.utils.toArray('.reveal').forEach(el => gsap.to(el, { y: 0, opacity: 1, duration: .65, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } }));
+
+      const headingTargets = gsap.utils.toArray('.hero-title, .section-heading, .quote-band h2');
+      headingTargets.forEach((heading, index) => {
+        const letters = splitIntoWords(heading);
+        const animation = gsap.fromTo(letters, { yPercent: 75, rotateX: -70, opacity: 0, transformOrigin: '50% 100%' }, {
+          yPercent: 0, rotateX: 0, opacity: 1, duration: .52, stagger: .022, ease: 'power3.out',
+          scrollTrigger: index === 0 ? undefined : { trigger: heading, start: 'top 82%', once: true }
+        });
+        if (index === 0) animation.delay(.28);
+      });
+
+      gsap.utils.toArray('.feature-row, .services-list, .plans').forEach(group => {
+        const cards = group.querySelectorAll('.feature-card, .service-card, .plan');
+        gsap.fromTo(cards, { y: 34, opacity: 0, scale: .965, rotateX: 3, transformPerspective: 900 }, {
+          y: 0, opacity: 1, scale: 1, rotateX: 0, duration: .72, stagger: .12, ease: 'power3.out',
+          scrollTrigger: { trigger: group, start: 'top 84%', once: true }
+        });
+      });
+      gsap.utils.toArray('.reveal:not(.feature-card):not(.service-card):not(.plan)').forEach(el => {
+        gsap.fromTo(el, { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: .78, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+      });
+
+      document.querySelectorAll('[data-count]').forEach(counter => {
+        const end = Number(counter.dataset.count);
+        const state = { value: 0 };
+        gsap.to(state, {
+          value: end, duration: 1.8, ease: 'power2.out', snap: { value: 1 },
+          onUpdate: () => { counter.textContent = `${Math.round(state.value)}${counter.dataset.suffix || ''}`; },
+          scrollTrigger: { trigger: counter, start: 'top 90%', once: true }
+        });
+      });
+      gsap.utils.toArray('.mosaic img, .choose-wide, .choose-tall').forEach((image, index) => {
+        gsap.fromTo(image, { yPercent: index % 2 ? 7 : -5 }, {
+          yPercent: index % 2 ? -4 : 5, ease: 'none',
+          scrollTrigger: { trigger: image.closest('.mosaic, .choose-visual'), start: 'top bottom', end: 'bottom top', scrub: .8 }
+        });
+      });
     });
   </script>
 </body>
