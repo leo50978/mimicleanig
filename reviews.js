@@ -4,6 +4,8 @@ const form = document.getElementById('reviewForm');
 const grid = document.getElementById('testimonialList');
 const status = document.getElementById('reviewFormStatus');
 const average = document.getElementById('averageRating');
+const heroAverage = document.getElementById('heroAverageRating');
+const heroAggregate = document.querySelector('.rating-aggregate');
 const submit = form?.querySelector('[type="submit"]');
 if (!form || !grid || !status || !average) throw new Error('Review UI is incomplete.');
 
@@ -17,7 +19,13 @@ function updateAverage(reviews) {
   const ratings = [...staticRatings, ...reviews.map(review => Number(review.rating))];
   if (!ratings.length) return;
   const value = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
-  average.textContent = value.toFixed(1);
+  const displayed = value.toFixed(1);
+  average.textContent = displayed;
+  if (heroAverage) heroAverage.textContent = `${displayed} / 5`;
+  if (heroAggregate) {
+    heroAggregate.style.setProperty('--rating-fill', `${Math.max(0, Math.min(100, value / 5 * 100))}%`);
+    heroAggregate.setAttribute('aria-label', `Average client rating: ${displayed} out of 5 stars`);
+  }
 }
 
 function formatDate(value) {

@@ -382,6 +382,19 @@
     @media (max-width: 420px) { .hero-media-frame { height: clamp(225px, 72vw, 300px); } }
     .feature-card, .hero-stat, .plan, .service-card, .testimonial-card { min-width: 0; }
     .hero-title, .hero-copy > p, .hero-stat span, .feature-card h3, .feature-card p, .service-meta h3 { overflow-wrap: anywhere; hyphens: auto; }
+
+    /* Keep every hero slide in one stable, landscape frame across breakpoints. */
+    .hero-art, .hero-media-frame { min-width: 0; }
+    .hero-media-frame { width: min(100%, 570px); height: auto; aspect-ratio: 60 / 49; }
+    .hero-kit { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .client-proof { min-width: 0; max-width: 100%; flex-wrap: wrap; row-gap: 9px; align-items: flex-start; }
+    .client-faces { min-width: 0; max-width: 100%; flex: 0 1 218px; width: min(52vw, 218px); }
+    .client-proof > span { min-width: 0; max-width: 100%; overflow-wrap: anywhere; line-height: 1.45; }
+    .feature-row > *, .hero-stats > *, .services-list > *, .plans > *, .footer-grid > * { min-width: 0; }
+    .hero-title, .hero-copy, .hero-stat span, .feature-card h3, .feature-card p, .service-meta h3, .footer-col a { max-width: 100%; overflow-wrap: anywhere; hyphens: auto; }
+    @media (max-width: 960px) { .hero-media-frame { width: 100%; height: auto; aspect-ratio: 60 / 49; } }
+    @media (max-width: 760px) { .hero-media-frame { width: min(100%, 500px); height: auto; aspect-ratio: 60 / 49; } }
+    @media (max-width: 420px) { .hero-media-frame { height: auto; aspect-ratio: 60 / 49; } }
 </style>
 <link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet"/><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://leo50978.github.io/mimicleanig/#organization","name":"Clino Cleaning Services","url":"https://leo50978.github.io/mimicleanig/","telephone":"+1-561-275-4445","logo":"https://leo50978.github.io/mimicleanig/assets/favicon-512.png","areaServed":[{"@type":"City","name":"Miami, Florida"},{"@type":"City","name":"Fort Lauderdale, Florida"},{"@type":"AdministrativeArea","name":"South Florida"}],"knowsAbout":["Home cleaning","Office cleaning","Yacht cleaning","Move-in and move-out cleaning","Vacation rental turnover cleaning"]},{"@type":"WebSite","@id":"https://leo50978.github.io/mimicleanig/#website","url":"https://leo50978.github.io/mimicleanig/","name":"Clino Cleaning Services","publisher":{"@id":"https://leo50978.github.io/mimicleanig/#organization"},"inLanguage":"en-US"}]}</script><link rel="canonical" href="https://leo50978.github.io/mimicleanig/"/><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"/><link rel="icon" href="assets/favicon-48.png" sizes="48x48" type="image/png"/><link rel="icon" href="assets/favicon-192.png" sizes="192x192" type="image/png"/><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"/><meta property="og:type" content="website"/><meta property="og:site_name" content="Clino Cleaning Services"/><meta property="og:title" content="Cleaning Services in Miami & Fort Lauderdale | Clino"/><meta property="og:description" content="Book home, office, move-in or yacht cleaning in Miami, Fort Lauderdale and nearby South Florida communities. Call Clino for a tailored cleaning estimate."/><meta property="og:url" content="https://leo50978.github.io/mimicleanig/"/><meta property="og:image" content="https://leo50978.github.io/mimicleanig/assets/og-clino.webp"/><meta property="og:image:alt" content="Clino cleaning services in Miami, Fort Lauderdale and South Florida"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Cleaning Services in Miami & Fort Lauderdale | Clino"/><meta name="twitter:description" content="Book home, office, move-in or yacht cleaning in Miami, Fort Lauderdale and nearby South Florida communities. Call Clino for a tailored cleaning estimate."/><meta name="twitter:image" content="https://leo50978.github.io/mimicleanig/assets/og-clino.webp"/><link rel="manifest" href="manifest.webmanifest"></head>
 <body>
@@ -397,7 +410,7 @@
 <div class="client-proof"><div aria-label="Illustrative portraits. Scroll horizontally to see more." class="client-faces"><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-12644996.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-30004315.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-37600418.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-38889899.webp"/><img alt="" aria-hidden="true" loading="eager" src="assets/clino-client-7624514.webp"/><span aria-label="64 more clients" class="more-clients">+64</span></div><span>Home, business &amp; marine care</span></div>
 <div class="hero-stats"><div class="hero-stat glass-card"><strong data-count="800" data-suffix="+">800+</strong><span>Happy Clients</span></div><div class="hero-stat glass-card"><strong data-count="180" data-suffix="+">180+</strong><span>Awards Received</span></div></div>
 </div>
-<div class="hero-art"><span class="bubble bubble-one"></span><span class="bubble bubble-two"></span><div class="hero-media-frame"><img alt="Worker cleaning a teak yacht deck by hand." class="hero-kit" data-hero-slide="0" fetchpriority="high" src="assets/clino-photo-5416343.webp"/></div></div>
+<div class="hero-art"><span class="bubble bubble-one"></span><span class="bubble bubble-two"></span><div class="hero-media-frame"><img alt="Worker cleaning a teak yacht deck by hand." class="hero-kit" data-hero-slide="0" fetchpriority="high" src="assets/hero/hero-deck.webp"/></div></div>
 </div>
 </section>
 <div aria-label="Why customers choose Clino" class="feature-row wrap">
@@ -518,14 +531,14 @@
     window.addEventListener('resize', updateServiceDot);
     updateServiceDot();
     const yachtHeroSlides = [
-      ['assets/clino-photo-5416343.webp', 'Worker cleaning a teak yacht deck by hand'],
-      ['assets/clino-photo-17418154.webp', 'Quiet seating beside the windows in a yacht cabin'],
-      ['assets/clino-photo-14730307.webp', 'A calm view of the sea from a boat cockpit'],
-      ['assets/clino-photo-6263742.webp', 'Yacht bridge controls and navigation equipment'],
-      ['assets/clino-photo-9429982.webp', 'Captain steering a boat along the coast'],
-      ['assets/clino-photo-11198974.webp', 'Yacht resting on calm water at sunrise'],
-      ['assets/clino-photo-18488011.webp', 'Sea and sailboats framed by a ship porthole'],
-      ['assets/clino-photo-4934632.webp', 'Sailors navigating a yacht under a bridge']
+      ['assets/hero/hero-deck.webp', 'Worker cleaning a teak yacht deck by hand'],
+      ['assets/hero/hero-cabin.webp', 'Quiet seating beside the windows in a yacht cabin'],
+      ['assets/hero/hero-cockpit.webp', 'A calm view of the sea from a boat cockpit'],
+      ['assets/hero/hero-bridge.webp', 'Yacht bridge controls and navigation equipment'],
+      ['assets/hero/hero-captain.webp', 'Captain steering a boat along the coast'],
+      ['assets/hero/hero-sunset.webp', 'Yacht resting on calm water at sunrise'],
+      ['assets/hero/hero-porthole.webp', 'Sea and sailboats framed by a ship porthole'],
+      ['assets/hero/hero-sailing.webp', 'Sailors navigating a yacht under a bridge']
     ];
     const heroImage = document.querySelector('[data-hero-slide]');
     let activeSlide = 0;
