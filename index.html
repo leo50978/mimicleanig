@@ -103,7 +103,7 @@
     .years-card { position: absolute; z-index: 2; left: 10%; bottom: 0; width: 130px; height: 130px; border-radius: 24px; display: grid; align-content: center; justify-items: center; background: var(--blue); color: #fff; box-shadow: 0 18px 35px #6581f455; text-align: center; }
     .years-card strong { font: 700 38px/.95 var(--display); }
     .years-card strong[data-count] { min-width: 3.5ch; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .years-card span { width: 75px; margin-top: 6px; font-size: 11px; font-weight: 800; line-height: 1.2; }
+    .years-card span { width: min(100%, 110px); margin-top: 6px; font-size: 11px; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; }
     .section-heading { margin: 15px 0 16px; font-size: clamp(30px, 2.9vw, 38px); line-height: 1.04; }
     .section-copy { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.8; text-align: justify; }
     .about-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 24px 0 22px; }
@@ -111,7 +111,7 @@
     .about-stat:last-child { border-right: 0; }
     .about-stat strong { display: block; color: var(--blue); font: 700 24px/1 var(--display); }
     .about-stat strong[data-count] { min-width: 5.3ch; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .about-stat span { display: block; margin-top: 4px; font-size: 11px; font-weight: 900; line-height: 1.25; }
+    .about-stat span { display: block; min-width: 0; margin-top: 4px; font-size: 11px; font-weight: 900; line-height: 1.25; overflow-wrap: anywhere; hyphens: auto; }
     .signature { margin-top: 18px; color: #5b5b72; font: italic 500 25px/1.2 var(--display); }
     .signature small { display: block; margin-top: 4px; color: var(--ink); font: 900 10px/1.4 var(--body); }
     .services-section { overflow: hidden; padding: 93px 0 83px; background: linear-gradient(118deg, #dce6ff 0%, #d5edff 56%, #a6ebef 100%); }
@@ -163,7 +163,7 @@
     .plan { min-width: 0; padding: 27px 29px 25px; border-radius: 22px; box-shadow: 0 15px 35px #304e9620; }
     .plan:nth-child(2) { border-color: #bfe2ff; }
     .plan h3 { margin: 0 0 12px; text-align: center; font-size: 19px; letter-spacing: 0; }
-    .plan-price { display: flex; align-items: baseline; justify-content: center; gap: 4px; margin-bottom: 21px; white-space: nowrap; }
+    .plan-price { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 4px; min-width: 0; margin-bottom: 21px; white-space: normal; overflow-wrap: anywhere; }
     .plan-price span { color: var(--blue); font: 700 26px/1 var(--display); }
     .plan-price strong { color: var(--blue); font: 700 52px/.9 var(--display); }
     .plan-price small { color: #7d8393; font-size: 12px; font-weight: 800; }
@@ -210,8 +210,8 @@
     .nav-backdrop { display: none; }
     .nav-backdrop[hidden] { display: none !important; }
     .menu-close { display: none; }
-    .letter-word { display: inline-block; white-space: nowrap; }
-    .letter-char { display: inline-block; white-space: pre; }
+    .letter-word { display: inline; white-space: normal; }
+    .letter-char { display: inline-block; white-space: normal; }
     @media (max-width: 960px) {
       .wrap { width: min(100% - 40px, 780px); }
       .nav { gap: 18px; }
@@ -344,7 +344,7 @@
     .booking-intro { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:19px; flex-wrap:wrap; }
     .booking-intro strong { font:700 21px/1.1 var(--display); color:var(--blue-deep); }
     .booking-intro span { font-size:11px;color:var(--muted); }
-    .booking-intro a { color:var(--deep);font-weight:900;white-space:nowrap; }
+    .booking-intro a { min-width:0;color:var(--deep);font-weight:900;white-space:normal;overflow-wrap:anywhere; }
     #bookingForm { display:grid; gap:13px; }
     #bookingForm label { display:grid; gap:6px; color:#525d75;font-size:12px;font-weight:900; }
     #bookingForm input,#bookingForm select { width:100%;min-height:44px;padding:10px 13px;border:1px solid #d4deef;border-radius:12px;background:#ffffffdc;color:var(--ink);outline:none; }

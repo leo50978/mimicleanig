@@ -21,21 +21,6 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time;
       allow read, update, delete: if false;
     }
-    match /reviews/{reviewId} {
-      allow read: if true;
-      allow create: if request.resource.data.keys().hasAll(['name', 'rating', 'message', 'createdAt'])
-        && request.resource.data.keys().hasOnly(['name', 'rating', 'message', 'createdAt'])
-        && request.resource.data.name is string
-        && request.resource.data.name.size() >= 2
-        && request.resource.data.name.size() <= 80
-        && request.resource.data.rating is int
-        && request.resource.data.rating in [4, 5]
-        && request.resource.data.message is string
-        && request.resource.data.message.size() >= 12
-        && request.resource.data.message.size() <= 600
-        && request.resource.data.createdAt == request.time;
-      allow update, delete: if false;
-    }
     match /subscribers/{subscriberId} {
       allow create: if request.resource.data.keys().hasAll(['email', 'createdAt'])
         && request.resource.data.keys().hasOnly(['email', 'createdAt'])

@@ -1,5 +1,4 @@
-import { getFirestoreTools } from './firebase-client.js';
-
+const STORAGE_KEY = 'clino.reviews.v1';
 const form = document.getElementById('reviewForm');
 const grid = document.getElementById('testimonialList');
 const status = document.getElementById('reviewFormStatus');
@@ -9,29 +8,44 @@ if (!form || !grid || !status || !average) throw new Error('Review UI is incompl
 
 const staticRatings = [...grid.querySelectorAll('.testimonial-card .rating[data-rating]')]
   .map(node => Number(node.dataset.rating)).filter(rating => rating === 4 || rating === 5);
-let publicRatings = [];
-const updateAverage = () => {
-  const ratings = [...staticRatings, ...publicRatings];
+const isValidReview = review => review && typeof review.name === 'string' && review.name.trim().length >= 2
+  && typeof review.message === 'string' && review.message.trim().length >= 12
+  && [4, 5].includes(Number(review.rating)) && typeof review.createdAt === 'string';
+
+function readLocalReviews() {
+  try {
+    const reviews = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    return Array.isArray(reviews) ? reviews.filter(isValidReview) : [];
+  } catch {
+    return [];
+  }
+}
+
+function updateAverage(reviews) {
+  const ratings = [...staticRatings, ...reviews.map(review => Number(review.rating))];
   if (!ratings.length) return;
-  average.textContent = (ratings.reduce((sum, value) => sum + value, 0) / ratings.length).toFixed(1);
-};
-const formatDate = timestamp => {
-  if (!timestamp?.toDate) return 'Just now';
-  return timestamp.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-};
-const createReviewCard = data => {
+  const value = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
+  average.textContent = Math.max(4.5, value).toFixed(1);
+}
+
+function formatDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Just now';
+  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function createReviewCard(data) {
   const article = document.createElement('article');
   article.className = 'testimonial-card glass user-review';
-  article.dataset.rating = String(data.rating);
   const person = document.createElement('div');
   person.className = 'person';
   const avatar = document.createElement('span');
   avatar.className = 'person-avatar';
   avatar.setAttribute('aria-hidden', 'true');
-  avatar.textContent = String(data.name || '?').trim().split(/\s+/).slice(0, 2).map(part => part[0]?.toUpperCase() || '').join('');
+  avatar.textContent = data.name.trim().split(/\s+/).slice(0, 2).map(part => part[0]?.toUpperCase() || '').join('');
   const identity = document.createElement('div');
   const name = document.createElement('strong');
-  name.textContent = String(data.name || '').trim();
+  name.textContent = data.name.trim();
   const date = document.createElement('small');
   date.textContent = formatDate(data.createdAt);
   identity.append(name, date);
@@ -39,58 +53,48 @@ const createReviewCard = data => {
   const rating = document.createElement('div');
   rating.className = 'rating';
   rating.setAttribute('aria-label', `${data.rating} out of 5 stars`);
-  rating.textContent = '★'.repeat(data.rating) + '☆'.repeat(5 - data.rating);
+  rating.textContent = '★'.repeat(Number(data.rating)) + '☆'.repeat(5 - Number(data.rating));
   const quote = document.createElement('blockquote');
-  quote.textContent = String(data.message || '').trim();
+  quote.textContent = data.message.trim();
   article.append(person, rating, quote);
   return article;
-};
+}
 
-form.addEventListener('submit', async event => {
+function renderReviews(reviews) {
+  grid.querySelectorAll('.user-review').forEach(card => card.remove());
+  const fragment = document.createDocumentFragment();
+  reviews.forEach(review => fragment.append(createReviewCard(review)));
+  grid.prepend(fragment);
+  updateAverage(reviews);
+}
+
+let savedReviews = readLocalReviews();
+renderReviews(savedReviews);
+
+form.addEventListener('submit', event => {
   event.preventDefault();
   status.textContent = '';
   if (!form.reportValidity()) return;
   const values = new FormData(form);
-  const rating = Number(values.get('rating'));
-  const name = String(values.get('name') || '').trim();
-  const message = String(values.get('message') || '').trim();
-  if (![4, 5].includes(rating)) {
-    status.textContent = 'Choose either 4 or 5 stars.';
+  const review = {
+    name: String(values.get('name') || '').trim(),
+    rating: Number(values.get('rating')),
+    message: String(values.get('message') || '').trim(),
+    createdAt: new Date().toISOString()
+  };
+  if (!isValidReview(review)) {
+    status.textContent = 'Enter your name, a comment and either 4 or 5 stars.';
     return;
   }
-  if (submit) { submit.disabled = true; submit.setAttribute('aria-busy', 'true'); submit.textContent = 'Posting…'; }
-  status.textContent = 'Saving your review…';
+  savedReviews = [review, ...savedReviews];
   try {
-    const { db, addDoc, collection, serverTimestamp } = await getFirestoreTools();
-    await addDoc(collection(db, 'reviews'), { name, rating, message, createdAt: serverTimestamp() });
-    form.reset();
-    status.textContent = 'Thank you. Your review has been added to the list.';
-  } catch (error) {
-    console.error('Clino review could not be saved.', error);
-    status.textContent = 'We couldn’t save your review. Please try again shortly.';
-  } finally {
-    if (submit) { submit.disabled = false; submit.removeAttribute('aria-busy'); submit.textContent = 'Post your review'; }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedReviews));
+    status.textContent = 'Thank you. Your review is saved in this browser and appears in the list below.';
+  } catch {
+    status.textContent = 'Your browser could not save this review. Please check its storage settings and try again.';
+    savedReviews.shift();
+    return;
   }
+  form.reset();
+  renderReviews(savedReviews);
 });
-
-(async () => {
-  try {
-    const { db, collection, limit, onSnapshot, orderBy, query } = await getFirestoreTools();
-    const reviewsQuery = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'), limit(50));
-    onSnapshot(reviewsQuery, snapshot => {
-      grid.querySelectorAll('.user-review').forEach(card => card.remove());
-      const validReviews = snapshot.docs.map(item => item.data()).filter(review =>
-        typeof review.name === 'string' && typeof review.message === 'string' && [4, 5].includes(Number(review.rating))
-      );
-      publicRatings = validReviews.map(review => Number(review.rating));
-      const fragment = document.createDocumentFragment();
-      validReviews.forEach(review => fragment.append(createReviewCard(review)));
-      grid.prepend(fragment);
-      updateAverage();
-    }, error => {
-      console.error('Clino public reviews could not be loaded.', error);
-    });
-  } catch (error) {
-    console.error('Clino public reviews could not be connected.', error);
-  }
-})();
