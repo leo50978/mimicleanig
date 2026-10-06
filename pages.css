@@ -38,3 +38,5 @@ body.menu-open .site-header .brand,body.menu-open .site-header .nav-tools{visibi
 @media(max-width:960px){.nav{gap:18px}.nav-links{gap:17px}}
 @media(max-width:760px){.nav{height:72px}.brand{font-size:25px}.nav-links{margin-right:0}.site-footer{padding:58px 0 29px}.footer-grid{gap:30px 22px}.site-footer .footer-bottom{margin-top:38px;flex-direction:column}.cleaning-options{grid-template-columns:1fr}.service-menu-actions>*{flex:1 1 145px}}
 @media(max-width:520px){.footer-grid{grid-template-columns:1fr 1fr}.footer-grid>div:first-child{grid-column:1/-1}}
+
+.person-avatar{width:58px;height:58px;flex:none;display:grid;place-items:center;border-radius:50%;border:3px solid #fff;background:linear-gradient(135deg,#a7e9ee,#6682f4);color:#fff;font-weight:900;font-size:16px}
