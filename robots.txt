@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://leo50978.github.io/mimicleanig/sitemap.xml
