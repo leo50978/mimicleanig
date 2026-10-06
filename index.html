@@ -77,10 +77,10 @@
     .client-faces span:nth-child(3) { background: #ffdbb5; }
     .client-faces span:nth-child(4) { background: #d7d1ff; }
     .client-faces span:last-child { width: 37px; height: 37px; background: var(--blue); color: #fff; font-size: 9px; }
-    .hero-stats { display: flex; gap: 15px; margin-top: 21px; }
-    .hero-stat { min-width: 150px; padding: 10px 17px; border-radius: 15px; display: flex; align-items: center; gap: 7px; background: #fff; box-shadow: 0 12px 35px #3b5cae10; }
-    .hero-stat strong { display: inline-block; min-width: 4.6ch; color: var(--blue); font: 700 26px/1 var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .hero-stat span { max-width: 72px; font-size: 10px; font-weight: 900; line-height: 1.2; }
+    .hero-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(100%, 380px); gap: 10px; margin-top: 21px; }
+    .hero-stat { min-width: 0; padding: 10px 12px; border-radius: 15px; display: flex; align-items: center; gap: 9px; background: #fff; box-shadow: 0 12px 35px #3b5cae10; }
+    .hero-stat strong { display: inline-block; flex: none; min-width: 4.1ch; color: var(--blue); font: 700 25px/1 var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .hero-stat span { flex: 1; min-width: 0; max-width: none; font-size: 10px; font-weight: 900; line-height: 1.2; white-space: nowrap; }
     .hero-art { position: relative; align-self: stretch; display: grid; place-items: center; min-width: 0; margin: -10px -47px -46px -28px; }
     .hero-art:before { content: ''; position: absolute; width: min(95%, 525px); aspect-ratio: 1; top: 12%; right: -1%; border-radius: 50%; background: radial-gradient(circle, #baf6f5a6 0 33%, #ffffff00 70%); }
     .hero-kit { position: relative; z-index: 1; width: min(125%, 615px); max-height: 590px; object-fit: contain; filter: drop-shadow(0 28px 25px #274ab348); }
@@ -299,9 +299,9 @@
       .nav-links { padding-inline: 15px; border-radius: 23px 0 0 23px; }
       .menu-close { margin-bottom: 22px; }
       .hero-ctas { gap: 12px; }
-      .hero-stats { gap: 9px; }
-      .hero-stat { min-width: 0; flex: 1; padding: 10px 12px; }
-      .hero-stat strong { font-size: 23px; }
+      .hero-stats { gap: 8px; }
+      .hero-stat { padding: 10px 9px; gap: 6px; }
+      .hero-stat strong { min-width: 3.7ch; font-size: clamp(18px, 5vw, 21px); }
       .hero-stat span { font-size: 9px; }
       .client-proof { margin-top: 26px; }
       .hero-art { min-height: 310px; }
