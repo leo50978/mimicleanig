@@ -3,12 +3,12 @@
 > Clino provides home, office, vacation-rental and boat/yacht cleaning services in South Florida.
 
 ## Website
-- Home: https://leo50978.github.io/mimicleanig/
-- Services: https://leo50978.github.io/mimicleanig/services.html
-- Miami home cleaning: https://leo50978.github.io/mimicleanig/miami-house-cleaning.html
-- Fort Lauderdale office cleaning: https://leo50978.github.io/mimicleanig/fort-lauderdale-office-cleaning.html
-- Boat and yacht cleaning: https://leo50978.github.io/mimicleanig/south-florida-yacht-cleaning.html
-- Move-in and move-out cleaning: https://leo50978.github.io/mimicleanig/south-florida-move-in-move-out-cleaning.html
+- Home: https://clinofive.com/
+- Services: https://clinofive.com/services.html
+- Miami home cleaning: https://clinofive.com/miami-house-cleaning.html
+- Fort Lauderdale office cleaning: https://clinofive.com/fort-lauderdale-office-cleaning.html
+- Boat and yacht cleaning: https://clinofive.com/south-florida-yacht-cleaning.html
+- Move-in and move-out cleaning: https://clinofive.com/south-florida-move-in-move-out-cleaning.html
 - Contact: tel:+15612754445
 
 ## Service area

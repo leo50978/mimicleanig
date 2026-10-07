@@ -6,6 +6,22 @@ Le site est publié sur **GitHub Pages** depuis le dépôt `leo50978/mimicleanig
 
 Dans le dépôt GitHub, ouvrir **Settings → Pages** et choisir **GitHub Actions** comme source de publication. Le workflow du dépôt construit l’artefact statique et le publie. Les mises à jour Firebase/Cloud Functions ne sont pas déployées par ce workflow.
 
+### Domaine personnalisé Clinofive
+
+Le domaine public du site est `clinofive.com`. Le fichier `CNAME` à la racine conserve cette valeur dans le dépôt. Comme la publication utilise GitHub Actions, il faut aussi renseigner `clinofive.com` dans **Settings → Pages → Custom domain**; GitHub ignore le fichier `CNAME` pour ce mode de publication.
+
+Chez le fournisseur DNS du domaine, configurer les enregistrements suivants :
+
+| Type | Nom / hôte | Valeur |
+| --- | --- | --- |
+| A | `@` | `185.199.108.153` |
+| A | `@` | `185.199.109.153` |
+| A | `@` | `185.199.110.153` |
+| A | `@` | `185.199.111.153` |
+| CNAME | `www` | `leo50978.github.io` |
+
+Supprimer les anciens enregistrements `A` ou `CNAME` conflictuels pour `@` et `www`. GitHub indique que la propagation DNS peut prendre jusqu’à 24 heures. Une fois les enregistrements détectés, activer **Enforce HTTPS** dans **Settings → Pages**.
+
 ## Pour chaque mise à jour
 
 1. Modifier les pages HTML, le CSS, le JavaScript ou les fichiers dans `assets/`. Pour le SEO, garder `sitemap.xml` à jour lorsqu’une page publique est ajoutée, et vérifier aussi ses URL canoniques. `service-worker.js` contient les pages gardées pour un premier usage hors ligne.
@@ -23,7 +39,7 @@ Dans le dépôt GitHub, ouvrir **Settings → Pages** et choisir **GitHub Action
    ```sh
    git add -- \
      '*.html' '*.css' '*.js' '*.xml' '*.txt' '*.webmanifest' \
-     assets README.md .github/workflows/pages.yml
+     CNAME assets README.md .github/workflows/pages.yml
    git commit -m "Update Clino website"
    git push origin main
    ```
@@ -41,7 +57,7 @@ Dans le dépôt GitHub, ouvrir **Settings → Pages** et choisir **GitHub Action
 ## Fichiers de référencement et de disponibilité
 
 - `sitemap.xml` liste les pages publiques canoniques. Mettre à jour la liste lorsqu’une page publique est créée ou retirée; exclure `admin.html`, `404.html` et `offline.html`.
-- `robots.txt` déclare l’emplacement du sitemap. Le site est un GitHub Pages de projet (`leo50978.github.io/mimicleanig/`), donc les robots des moteurs cherchent normalement `robots.txt` à la racine du domaine (`leo50978.github.io/robots.txt`). Le fichier dans ce dépôt ne contrôle pas cette racine partagée; un domaine personnalisé ou une configuration au niveau du dépôt utilisateur est nécessaire pour publier une règle robots à la racine du domaine.
+- `robots.txt` déclare l’emplacement du sitemap sur `clinofive.com`.
 - `llms.txt` résume les services et les pages utiles aux outils d’IA. Mettre ses liens à jour avec le sitemap.
 - `404.html` fournit la page d’erreur GitHub Pages. `offline.html` est le secours de navigation quand la connexion tombe; `service-worker.js` garde en cache le noyau du site après la première visite et met en cache les autres pages consultées.
 - Les icônes de navigateur sont dans `assets/`; `manifest.webmanifest` référence les icônes d’installation.
