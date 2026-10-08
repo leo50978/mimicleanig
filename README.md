@@ -58,7 +58,7 @@ Supprimer les anciens enregistrements `A` ou `CNAME` conflictuels pour `@` et `w
 
 - `sitemap.xml` liste les pages publiques canoniques. Mettre à jour la liste lorsqu’une page publique est créée ou retirée; exclure `admin.html`, `404.html` et `offline.html`.
 - `robots.txt` déclare l’emplacement du sitemap sur `clinofive.com`.
-- `llms.txt` résume les services et les pages utiles aux outils d’IA. Mettre ses liens à jour avec le sitemap.
+- `llms.txt` résume les services et les pages utiles aux outils d’IA. Mettre ses liens à jour avec le sitemap. Les pages de service régional et de nettoyage kosher-friendly sont `west-palm-beach-broward-cleaning.html` et `kosher-friendly-cleaning.html`.
 - `404.html` fournit la page d’erreur GitHub Pages. `offline.html` est le secours de navigation quand la connexion tombe; `service-worker.js` garde en cache le noyau du site après la première visite et met en cache les autres pages consultées.
 - Les icônes de navigateur sont dans `assets/`; `manifest.webmanifest` référence les icônes d’installation.
 - Les nouvelles pages de service local doivent avoir un titre, une description, une URL canonique, des liens internes et un contenu utile propre à leur service et leur secteur. Ne pas inventer d’adresse, de tarif, de note ou de zone de couverture confirmée.
