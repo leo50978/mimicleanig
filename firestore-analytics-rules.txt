@@ -1,0 +1,40 @@
+Paste this block inside `match /databases/{database}/documents { ... }` in Firestore Rules. It keeps aggregate metrics only; reading the aggregate counters is public because the current dashboard has a front-end-only PIN and no Firebase Authentication. Do not use this for names, emails, IP addresses, exact location, or visitor-level records.
+
+    function validAnalyticsKey(metric, key) {
+      return (metric == 'pageviews' && key == 'all')
+        || (metric == 'visits' && key == 'all')
+        || (metric == 'page' && key in ['home', 'about', 'services', 'testimonials', 'blog', 'miami_house_cleaning', 'fort_lauderdale_office_cleaning', 'move_in_move_out_cleaning', 'yacht_cleaning', 'west_palm_broward_cleaning', 'kosher_friendly_cleaning', 'privacy_policy', 'not_found', 'other_page'])
+        || (metric == 'device' && key in ['mobile', 'tablet', 'desktop'])
+        || (metric == 'source' && key in ['direct', 'internal', 'search', 'facebook', 'instagram', 'yelp', 'nextdoor', 'campaign_other', 'referral_other', 'other'])
+        || (metric == 'timezone' && key in ['us_eastern', 'us_central', 'us_mountain', 'us_pacific', 'us_alaska', 'us_hawaii', 'non_us_or_other', 'unknown'])
+        || (metric == 'click' && key in ['booking_submit', 'newsletter_submit', 'review_submit', 'social_link', 'phone_call', 'email_link', 'booking_open', 'navigation', 'service_link', 'booking_cta', 'contact_cta', 'review_action', 'menu_toggle', 'other_button', 'other_link'])
+        || (metric == 'engaged_seconds' && key in ['home', 'about', 'services', 'testimonials', 'blog', 'miami_house_cleaning', 'fort_lauderdale_office_cleaning', 'move_in_move_out_cleaning', 'yacht_cleaning', 'west_palm_broward_cleaning', 'kosher_friendly_cleaning', 'privacy_policy', 'not_found', 'other_page']);
+    }
+
+    function validAnalyticsWrite() {
+      return request.resource.data.keys().hasOnly(['day', 'metric', 'key', 'count', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['day', 'metric', 'key', 'count', 'updatedAt'])
+        && request.resource.data.day is int
+        && request.resource.data.day == request.time.year() * 10000 + request.time.month() * 100 + request.time.day()
+        && request.resource.data.metric is string
+        && request.resource.data.key is string
+        && validAnalyticsKey(request.resource.data.metric, request.resource.data.key)
+        && request.resource.data.count is int
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    match /siteAnalytics/{counterId} {
+      // These records contain daily aggregate counters only, not visitor identities.
+      allow get, list: if request.query.limit != null && request.query.limit <= 5000;
+      allow create: if validAnalyticsWrite()
+        && request.resource.data.count >= 1
+        && request.resource.data.count <= 15;
+      allow update: if validAnalyticsWrite()
+        && request.resource.data.day == resource.data.day
+        && request.resource.data.metric == resource.data.metric
+        && request.resource.data.key == resource.data.key
+        && request.resource.data.count > resource.data.count
+        && request.resource.data.count <= resource.data.count + 15
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['count', 'updatedAt']);
+      allow delete: if false;
+    }

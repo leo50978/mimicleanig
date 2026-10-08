@@ -17,12 +17,15 @@
       <h1 class="section-title">Privacy information</h1>
       <p class="section-intro">Clino uses the Meta Pixel to measure visits from Meta ads and understand ad performance. The Pixel loads when a page opens and sends a PageView event to Meta.</p>
       <h2>Information sent to Meta</h2>
-      <p class="local-body">The Pixel may send the page visited, referring page, browser and device details, and ad interaction identifiers. Meta may also receive network information such as an IP address when your browser connects to its service. Clino uses the standard PageView event and does not send names, email addresses, booking details, or contact events through this Pixel.</p>
+      <p class="local-body">The Pixel may send the page visited, referring page, browser and device details, and ad interaction identifiers to Meta. Meta may also receive network information such as an IP address when your browser connects to its service. Clino uses the standard PageView event and does not send names, email addresses, booking details, or contact events through this Pixel.
+      </p>
+      <h2>Clino dashboard activity metrics</h2>
+      <p class="local-body">The website also writes daily aggregate counts directly to Clino’s Firebase Firestore database: page views, browser tab visits, broad device category, referral source category, broad timezone region, button action category, and visible-page time. The site does not store a raw IP address, a named visitor identity, exact location, full browser fingerprint, form contents, or a persistent visitor ID in this analytics collection. A timezone region is only a rough estimate and may not match a person’s physical location. Because this simple dashboard uses no sign-in or server function, the aggregate analytics counters are readable from the public website and are not suitable for private or visitor-level information.</p>
       <p class="local-body">For details about Meta’s own processing, read the <a href="https://www.facebook.com/privacy/policy/" rel="noopener noreferrer" target="_blank">Meta Privacy Policy</a>. You can manage advertising and personalization preferences through your Meta account and browser settings.</p>
       <p class="local-body">Questions about this site’s privacy information? Call Clino at <a href="tel:+15612754445">+1 (561) 275-4445</a>.</p>
       <p><a class="button" href="index.html">Return to Clino</a></p>
     </div>
   </main>
   <script src="meta-pixel.js"></script>
-</body>
+<script type="module" src="analytics.js"></script></body>
 </html>
