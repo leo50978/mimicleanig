@@ -5,8 +5,8 @@
   <meta name="theme-color" content="#f7f9ff"><meta name="robots" content="noindex,nofollow"><title>Private dashboard | Clino</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="pages.css"><link rel="stylesheet" href="admin.css">
-  <script src="admin.js" defer></script>
+  <link rel="stylesheet" href="pages.css"><link rel="stylesheet" href="admin.css?v=viewport-v1">
+  <script src="admin.js?v=viewport-v1" defer></script>
 </head>
 <body class="admin-page">
   <header class="admin-top">
@@ -42,7 +42,7 @@
         <div class="dashboard-toolbar"><div class="toolbar-context"><span class="eyebrow">CLINO · WORKSPACE</span><span id="dashboardToday"></span></div><div class="toolbar-actions"><button class="icon-button" id="refreshDashboard" type="button" aria-label="Refresh dashboard" title="Refresh data">↻</button><label class="analytics-range-label" for="analyticsRange"><span>Reporting period</span><select id="analyticsRange"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option></select></label></div></div>
         <p class="admin-status dashboard-status" id="dashboardStatus" role="status" aria-live="polite"></p>
         <section class="dashboard-view is-visible" id="view-overview" data-view-panel="overview" aria-labelledby="viewTitle-overview">
-          <div class="page-heading"><div><h1 id="viewTitle-overview">Your business at a glance</h1><p>Recent activity and the signals that matter, all in one place.</p></div></div>
+          <h1 class="sr-only" id="viewTitle-overview">Overview</h1>
           <p class="admin-status analytics-status" id="analyticsStatus" role="status" aria-live="polite"></p>
           <div class="analytics-kpis" id="analyticsKpis"></div>
           <div class="overview-grid">

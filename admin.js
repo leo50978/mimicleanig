@@ -370,6 +370,7 @@ async function loadDashboardData() {
 function showDashboard() {
   loginPanel.hidden = true;
   dashboard.hidden = false;
+  document.body.classList.add('has-dashboard');
   $('adminLogout').hidden = false;
   loadDashboardData();
 }
@@ -476,6 +477,7 @@ $('adminLogout').addEventListener('click', () => {
   sessionStorage.removeItem(sessionKey);
   $('adminLogout').hidden = true;
   dashboard.hidden = true;
+  document.body.classList.remove('has-dashboard');
   loginPanel.hidden = false;
   loginForm.reset();
   adminStatus.textContent = 'You are signed out.';
