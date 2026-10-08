@@ -1,5 +1,8 @@
 import { getFirestoreTools } from './firebase-client.js';
 
+// Honor browser opt-out signals for both first-party analytics and IP lookup.
+if (navigator.globalPrivacyControl !== true) {
+
 const pageNames = {
   '/': 'home',
   '/index.html': 'home',
@@ -132,6 +135,47 @@ async function recordSessionStart() {
   });
 }
 
+async function recordVisitorLocation() {
+  const lookupKey = `clino_geo_lookup_${dayNumber}`;
+  try {
+    if (sessionStorage.getItem(lookupKey)) return;
+    sessionStorage.setItem(lookupKey, '1');
+  } catch {
+    return;
+  }
+
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await fetch('https://ipwho.is/', {
+      cache: 'no-store',
+      referrerPolicy: 'no-referrer',
+      signal: controller.signal
+    });
+    if (!response.ok) return;
+    const result = await response.json();
+    if (!result.success || typeof result.ip !== 'string') return;
+
+    const location = {
+      ip: result.ip.slice(0, 45),
+      city: typeof result.city === 'string' ? result.city.slice(0, 100) : '',
+      region: typeof result.region === 'string' ? result.region.slice(0, 100) : '',
+      country: typeof result.country === 'string' ? result.country.slice(0, 100) : ''
+    };
+    const { db, doc, updateDoc, serverTimestamp } = await getTools();
+    await updateDoc(doc(db, 'visitorSessions', visitorSessionId), {
+      ...location,
+      lastActiveAt: serverTimestamp(),
+      geoUpdatedAt: serverTimestamp()
+    });
+  } catch {
+    // Basic page/click analytics continue when the geolocation provider is unavailable.
+    console.warn('Clino IP location lookup/storage did not complete; activity tracking continues.');
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
 async function recordJourney(type, { actionKey = '', actionLabel = '', seconds = 0 } = {}) {
   const { db, collection, addDoc, doc, updateDoc, serverTimestamp } = await getTools();
   updateDoc(doc(db, 'visitorSessions', visitorSessionId), { lastActiveAt: serverTimestamp() }).catch(() => {});
@@ -154,7 +198,7 @@ function recordJourneySafely(type, details) {
 record('pageviews', 'all');
 record('page', pageKey);
 record('device', device);
-recordSessionStart().catch(() => {});
+recordSessionStart().then(recordVisitorLocation).catch(() => {});
 recordJourneySafely('page');
 
 try {
@@ -224,3 +268,5 @@ document.addEventListener('visibilitychange', () => {
 });
 window.setInterval(flushTime, 5000);
 window.addEventListener('pagehide', flushTime, { once: true });
+
+}

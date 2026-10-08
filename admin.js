@@ -1,5 +1,5 @@
 // Front-end-only access gate. The 1199 code is a convenience screen, not a
-// security boundary; public Firestore analytics must never contain personal data.
+// security boundary; Firestore analytics data, including IPs, is publicly readable.
 const ADMIN_ACCESS_CODE = '1199';
 const sessionKey = 'clinoAdminUnlocked';
 const firebaseConfig = {
@@ -159,9 +159,14 @@ function drawChart(daily, days) {
   });
 }
 
-function renderAnalytics(documents, days) {
+function renderAnalytics(documents, sessionDocuments, days) {
   const totals = { pageviews: 0, visits: 0, engaged: 0, clicks: 0 };
-  const pages = {}, clicks = {}, devices = {}, sources = {}, regions = {};
+  const pages = {}, clicks = {}, devices = {}, sources = {}, regions = {}, locations = Object.create(null);
+  sessionDocuments.forEach(item => {
+    const session = item.data();
+    const label = [session.city, session.region, session.country].filter(value => typeof value === 'string' && value.trim()).join(', ');
+    if (label) locations[label] = (locations[label] || 0) + 1;
+  });
   const daily = new Map();
   documents.forEach(item => {
     const d = item.data();
@@ -197,6 +202,7 @@ function renderAnalytics(documents, days) {
   appendRows('analyticsClicks', clicks, clickLabels, 'No button clicks yet.');
   appendRows('analyticsDevices', devices, deviceLabels, 'No device data yet.');
   appendRows('analyticsSources', sources, sourceLabels, 'No source data yet.');
+  appendRows('analyticsLocations', locations, {}, 'No IP location data yet.');
   appendRows('analyticsRegions', regions, timezoneLabels, 'No timezone data yet.');
   drawChart(daily, days);
 }
@@ -225,12 +231,15 @@ function renderSessionJourneys(sessionDocuments, eventDocuments) {
     card.className = 'analytics-session-card';
     const shortId = String(session.sessionId || session.id).slice(0, 8);
     const started = dateLabel(session.startedAt);
+    const location = [session.city, session.region, session.country].filter(value => typeof value === 'string' && value.trim()).join(', ');
     const metadata = [
+      session.ip ? `IP ${session.ip}` : '',
+      location ? `Approx. ${location}` : '',
       deviceLabels[session.device] || 'Device unknown',
       sourceLabels[session.source] || 'Source unknown',
       timezoneLabels[session.timezone] || 'Region unknown',
       `Started ${started}`
-    ].join(' · ');
+    ].filter(Boolean).join(' · ');
     card.append(text('h4', `Visit ${shortId}…`), text('p', metadata, 'analytics-session-meta'));
     const trail = document.createElement('ol');
     trail.className = 'analytics-session-trail';
@@ -291,7 +300,7 @@ async function loadDashboardData() {
     if (subscribers.status === 'fulfilled') renderSubscribers(subscribers.value.docs.map(doc => doc.data()));
     else { renderSubscribers([]); $('subscriberList').replaceChildren(text('p', 'Firestore rules do not allow reading email sign-ups.', 'empty-note')); }
     if (analytics.status === 'fulfilled') {
-      renderAnalytics(analytics.value.docs, days);
+      renderAnalytics(analytics.value.docs, sessions.status === 'fulfilled' ? sessions.value.docs : [], days);
       $('analyticsStatus').textContent = analytics.value.empty ? 'No activity yet for this period.' : '';
     } else {
       $('analyticsKpis').replaceChildren(); $('analyticsChart').replaceChildren();
@@ -303,7 +312,7 @@ async function loadDashboardData() {
       rulesLink.rel = 'noopener noreferrer';
       rulesLink.textContent = 'Open the copy-ready rules';
       status.append(rulesLink);
-      ['analyticsPages', 'analyticsClicks', 'analyticsDevices', 'analyticsSources', 'analyticsRegions'].forEach(id => $(id).replaceChildren());
+      ['analyticsPages', 'analyticsClicks', 'analyticsDevices', 'analyticsSources', 'analyticsLocations', 'analyticsRegions'].forEach(id => $(id).replaceChildren());
     }
     if (sessions.status === 'fulfilled' && events.status === 'fulfilled') {
       renderSessionJourneys(sessions.value.docs, events.value.docs);

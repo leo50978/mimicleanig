@@ -1,6 +1,6 @@
-Replace the previously pasted analytics block with this complete version. Paste it inside `match /databases/{database}/documents { ... }` in Firestore Rules. It enables daily aggregate counters and anonymous tab-session journeys. It does not use Cloud Functions or store names, emails, IP addresses, exact locations, full URLs, or form contents.
+Replace the previously pasted analytics block with this complete version. Paste it inside `match /databases/{database}/documents { ... }` in Firestore Rules. It enables daily aggregate counters and browser-tab journeys, including IP addresses and approximate city/region/country returned by IPWho.is. It does not use Cloud Functions or store names, emails, exact addresses, full URLs, or form contents.
 
-Analytics reads are public because the static dashboard has no Firebase Authentication or server function; its 1199 screen is not a security boundary. Use these collections only for non-sensitive analytics. Counters and sessions can be altered by public clients, and stored records do not expire automatically.
+Analytics reads are public because the static dashboard has no Firebase Authentication or server function; its 1199 screen is not a security boundary. IP and location values are personal data and will be visible to anyone who can read the database. Counters and sessions can be altered by public clients, and stored records do not expire automatically. Use this version only if you accept those consequences.
 
     function validPageKey(key) {
       return key in ['home', 'about', 'services', 'testimonials', 'blog', 'miami_house_cleaning', 'fort_lauderdale_office_cleaning', 'move_in_move_out_cleaning', 'yacht_cleaning', 'west_palm_broward_cleaning', 'kosher_friendly_cleaning', 'privacy_policy', 'not_found', 'other_page'];
@@ -49,7 +49,7 @@ Analytics reads are public because the static dashboard has no Firebase Authenti
     }
 
     function validSessionFields(sessionId) {
-      return request.resource.data.keys().hasOnly(['sessionId', 'day', 'device', 'source', 'timezone', 'firstPage', 'startedAt', 'lastActiveAt'])
+      return request.resource.data.keys().hasOnly(['sessionId', 'day', 'device', 'source', 'timezone', 'firstPage', 'startedAt', 'lastActiveAt', 'ip', 'city', 'region', 'country', 'geoUpdatedAt'])
         && request.resource.data.keys().hasAll(['sessionId', 'day', 'device', 'source', 'timezone', 'firstPage', 'startedAt', 'lastActiveAt'])
         && request.resource.data.sessionId == sessionId
         && validSessionId(sessionId)
@@ -60,7 +60,12 @@ Analytics reads are public because the static dashboard has no Firebase Authenti
         && request.resource.data.timezone in ['us_eastern', 'us_central', 'us_mountain', 'us_pacific', 'us_alaska', 'us_hawaii', 'non_us_or_other', 'unknown']
         && validPageKey(request.resource.data.firstPage)
         && request.resource.data.startedAt is timestamp
-        && request.resource.data.lastActiveAt is timestamp;
+        && request.resource.data.lastActiveAt is timestamp
+        && (!('ip' in request.resource.data) || (request.resource.data.ip is string && request.resource.data.ip.size() <= 45))
+        && (!('city' in request.resource.data) || (request.resource.data.city is string && request.resource.data.city.size() <= 100))
+        && (!('region' in request.resource.data) || (request.resource.data.region is string && request.resource.data.region.size() <= 100))
+        && (!('country' in request.resource.data) || (request.resource.data.country is string && request.resource.data.country.size() <= 100))
+        && (!('geoUpdatedAt' in request.resource.data) || request.resource.data.geoUpdatedAt is timestamp);
     }
 
     match /visitorSessions/{sessionId} {
@@ -77,7 +82,7 @@ Analytics reads are public because the static dashboard has no Firebase Authenti
         && request.resource.data.firstPage == resource.data.firstPage
         && request.resource.data.startedAt == resource.data.startedAt
         && request.resource.data.lastActiveAt == request.time
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastActiveAt']);
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastActiveAt', 'ip', 'city', 'region', 'country', 'geoUpdatedAt']);
       allow delete: if false;
     }
 
