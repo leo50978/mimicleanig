@@ -56,11 +56,36 @@ function sourceGroup() {
 }
 
 const sessionKey = `clino_analytics_session_counted_${dayNumber}`;
+const visitorSessionKey = `clino_visitor_session_${dayNumber}`;
 let firestore;
+let visitorSessionId;
+let isNewVisitorSession = false;
+
+function createVisitorSessionId() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return [...bytes].map(value => value.toString(16).padStart(2, '0')).join('');
+}
+
+try {
+  visitorSessionId = sessionStorage.getItem(visitorSessionKey);
+  if (!visitorSessionId) {
+    visitorSessionId = createVisitorSessionId();
+    sessionStorage.setItem(visitorSessionKey, visitorSessionId);
+    isNewVisitorSession = true;
+  }
+} catch {
+  visitorSessionId = createVisitorSessionId();
+  isNewVisitorSession = true;
+}
+
+async function getTools() {
+  if (!firestore) firestore = await getFirestoreTools();
+  return firestore;
+}
 
 async function increment(metric, key, amount = 1) {
-  if (!firestore) firestore = await getFirestoreTools();
-  const { db, doc, setDoc, increment: incrementField, serverTimestamp } = firestore;
+  const { db, doc, setDoc, increment: incrementField, serverTimestamp } = await getTools();
   const id = `${dayNumber}_${metric}_${key}`;
   await setDoc(doc(db, 'siteAnalytics', id), {
     day: dayNumber,
@@ -75,9 +100,62 @@ function record(metric, key, amount = 1) {
   increment(metric, key, amount).catch(() => {});
 }
 
+async function recordSessionStart() {
+  const { db, doc, setDoc, updateDoc, serverTimestamp } = await getTools();
+  const ref = doc(db, 'visitorSessions', visitorSessionId);
+  if (!isNewVisitorSession) {
+    try {
+      await updateDoc(ref, { lastActiveAt: serverTimestamp() });
+    } catch {
+      await setDoc(ref, {
+        sessionId: visitorSessionId,
+        day: dayNumber,
+        device,
+        source: sourceGroup(),
+        timezone: timezoneGroup(timezone),
+        firstPage: pageKey,
+        startedAt: serverTimestamp(),
+        lastActiveAt: serverTimestamp()
+      });
+    }
+    return;
+  }
+  await setDoc(ref, {
+    sessionId: visitorSessionId,
+    day: dayNumber,
+    device,
+    source: sourceGroup(),
+    timezone: timezoneGroup(timezone),
+    firstPage: pageKey,
+    startedAt: serverTimestamp(),
+    lastActiveAt: serverTimestamp()
+  });
+}
+
+async function recordJourney(type, { actionKey = '', actionLabel = '', seconds = 0 } = {}) {
+  const { db, collection, addDoc, doc, updateDoc, serverTimestamp } = await getTools();
+  updateDoc(doc(db, 'visitorSessions', visitorSessionId), { lastActiveAt: serverTimestamp() }).catch(() => {});
+  await addDoc(collection(db, 'visitorEvents'), {
+    day: dayNumber,
+    sessionId: visitorSessionId,
+    type,
+    page: pageKey,
+    actionKey,
+    actionLabel,
+    seconds,
+    occurredAt: serverTimestamp()
+  });
+}
+
+function recordJourneySafely(type, details) {
+  recordJourney(type, details).catch(() => {});
+}
+
 record('pageviews', 'all');
 record('page', pageKey);
 record('device', device);
+recordSessionStart().catch(() => {});
+recordJourneySafely('page');
 
 try {
   if (!sessionStorage.getItem(sessionKey)) {
@@ -117,7 +195,10 @@ function clickGroup(element) {
 document.addEventListener('click', event => {
   const target = event.target instanceof Element ? event.target.closest('a, button, [role="button"]') : null;
   if (!target || target.closest('.admin-trigger')) return;
-  record('click', clickGroup(target));
+  const actionKey = clickGroup(target);
+  const actionLabel = `${target.getAttribute('aria-label') || target.innerText || target.textContent || ''}`.replace(/\s+/g, ' ').trim().slice(0, 80);
+  record('click', actionKey);
+  recordJourneySafely('click', { actionKey, actionLabel });
 });
 
 let lastTick = document.visibilityState === 'visible' ? performance.now() : 0;
@@ -133,6 +214,7 @@ function flushTime() {
   if (whole > 0) {
     activeSeconds -= whole;
     record('engaged_seconds', pageKey, whole);
+    recordJourneySafely('engaged', { seconds: whole });
   }
 }
 

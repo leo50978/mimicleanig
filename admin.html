@@ -17,19 +17,20 @@
       <p class="admin-status" id="adminStatus" role="status" aria-live="polite"></p>
     </section>
     <section class="dashboard" id="dashboard" hidden>
-      <div class="dashboard-head"><div><span class="eyebrow">Private overview</span><h1>Site analytics</h1><p>Anonymous daily totals for visits, pages, device types and site actions.</p></div><button class="button outline" id="adminLogout" type="button">Sign out</button></div>
+      <div class="dashboard-head"><div><span class="eyebrow">Private overview</span><h1>Site analytics</h1><p>Daily totals and anonymous visit journeys, stored directly in Firestore.</p></div><button class="button outline" id="adminLogout" type="button">Sign out</button></div>
       <section class="data-panel glass-card analytics-panel" aria-labelledby="analyticsTitle">
         <div class="analytics-heading"><div><h2 id="analyticsTitle">Website activity</h2><p>Counts are aggregated by day; they do not identify individual people.</p></div><label class="analytics-range-label" for="analyticsRange">Period<select id="analyticsRange"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option></select></label></div>
         <p class="admin-status analytics-status" id="analyticsStatus" role="status" aria-live="polite"></p>
         <div class="analytics-kpis" id="analyticsKpis"></div>
         <div class="analytics-chart-card"><h3>Daily activity</h3><div class="chart-legend"><span><i class="legend-pageviews"></i>Page views</span><span><i class="legend-visits"></i>Visits</span><span><i class="legend-clicks"></i>Button clicks</span></div><svg id="analyticsChart" class="analytics-chart" viewBox="0 0 900 250" role="img" aria-label="Daily page views, visits and button clicks for the selected period"></svg></div>
+        <div class="analytics-sessions-card"><div><h3>Recent anonymous visit journeys</h3><p>Temporary random ID for this browser tab and UTC day. It does not identify a person.</p></div><p class="admin-status analytics-status" id="analyticsSessionsStatus" role="status" aria-live="polite"></p><div id="analyticsSessions" class="analytics-sessions-list"></div></div>
         <div class="analytics-breakdowns">
           <article><h3>Most visited pages</h3><ol id="analyticsPages"></ol></article>
           <article><h3>Button actions</h3><ol id="analyticsClicks"></ol></article>
           <article><h3>Devices &amp; traffic</h3><ol id="analyticsDevices"></ol><h4 class="analytics-subheading">Traffic sources</h4><ol id="analyticsSources"></ol></article>
           <article><h3>Approximate timezone region</h3><ol id="analyticsRegions"></ol><p class="analytics-note">This is a broad browser-timezone estimate, not the visitor’s verified physical location.</p></article>
         </div>
-        <p class="analytics-note">Visits are tab sessions, not unique named people. No raw IP address, name, email, exact location or form contents are stored. Aggregate counters are readable from the public website because this dashboard has no Firebase Authentication or server function.</p>
+        <p class="analytics-note">A visit is a temporary browser session, not a verified person. The session timeline stores page names, button labels/categories and visible time with a random ID. No raw IP address, name, email, exact location, full URL or form contents are stored. Timezone is approximate. Analytics counters and session events are publicly readable because this static dashboard has no Firebase Authentication or server function.</p>
       </section>
       <section class="data-panel glass-card"><h2>Booking messages <span id="bookingCount">0</span></h2><div id="bookingList" class="data-list"></div></section>
       <section class="data-panel glass-card"><h2>Email sign-ups <span id="subscriberCount">0</span></h2><div id="subscriberList" class="email-list"></div></section>

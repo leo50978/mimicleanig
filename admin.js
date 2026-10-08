@@ -1,5 +1,5 @@
 // Front-end-only access gate. The 1199 code is a convenience screen, not a
-// security boundary; the analytics collection contains aggregate counters only.
+// security boundary; public Firestore analytics must never contain personal data.
 const ADMIN_ACCESS_CODE = '1199';
 const sessionKey = 'clinoAdminUnlocked';
 const firebaseConfig = {
@@ -41,6 +41,7 @@ const timezoneLabels = {
   us_eastern: 'US Eastern', us_central: 'US Central', us_mountain: 'US Mountain', us_pacific: 'US Pacific',
   us_alaska: 'Alaska', us_hawaii: 'Hawaii', non_us_or_other: 'Other / outside US', unknown: 'Unknown'
 };
+const eventTypeLabels = { page: 'Viewed', click: 'Clicked', engaged: 'Active' };
 
 function text(tag, value, className) {
   const node = document.createElement(tag);
@@ -200,6 +201,70 @@ function renderAnalytics(documents, days) {
   drawChart(daily, days);
 }
 
+function renderSessionJourneys(sessionDocuments, eventDocuments) {
+  const list = $('analyticsSessions');
+  const status = $('analyticsSessionsStatus');
+  list.replaceChildren();
+  const eventMap = new Map();
+  eventDocuments.forEach(item => {
+    const data = item.data();
+    const rows = eventMap.get(data.sessionId) || [];
+    rows.push(data);
+    eventMap.set(data.sessionId, rows);
+  });
+  const sessions = sessionDocuments.map(item => ({ id: item.id, ...item.data() }))
+    .sort((a, b) => (b.lastActiveAt?.toMillis?.() || 0) - (a.lastActiveAt?.toMillis?.() || 0))
+    .slice(0, 20);
+  if (!sessions.length) {
+    list.append(text('p', 'No anonymous visit journeys recorded for this period.', 'analytics-empty'));
+    status.textContent = '';
+    return;
+  }
+  sessions.forEach(session => {
+    const card = document.createElement('article');
+    card.className = 'analytics-session-card';
+    const shortId = String(session.sessionId || session.id).slice(0, 8);
+    const started = dateLabel(session.startedAt);
+    const metadata = [
+      deviceLabels[session.device] || 'Device unknown',
+      sourceLabels[session.source] || 'Source unknown',
+      timezoneLabels[session.timezone] || 'Region unknown',
+      `Started ${started}`
+    ].join(' · ');
+    card.append(text('h4', `Visit ${shortId}…`), text('p', metadata, 'analytics-session-meta'));
+    const trail = document.createElement('ol');
+    trail.className = 'analytics-session-trail';
+    const events = (eventMap.get(session.sessionId || session.id) || [])
+      .sort((a, b) => (a.occurredAt?.toMillis?.() || 0) - (b.occurredAt?.toMillis?.() || 0));
+    events.forEach(event => {
+      let detail = '';
+      if (event.type === 'page') detail = `${eventTypeLabels.page} ${pageLabels[event.page] || 'a page'}`;
+      if (event.type === 'click') {
+        const group = clickLabels[event.actionKey] || 'Site action';
+        detail = `${eventTypeLabels.click} ${event.actionLabel || group} · ${group}`;
+      }
+      if (event.type === 'engaged') detail = `${eventTypeLabels.engaged} ${number(event.seconds)}s on ${pageLabels[event.page] || 'a page'}`;
+      if (!detail) return;
+      trail.append(text('li', `${dateLabel(event.occurredAt)} · ${detail}`));
+    });
+    if (!trail.children.length) trail.append(text('li', 'No page or action events were captured.'));
+    card.append(trail);
+    list.append(card);
+  });
+  status.textContent = '';
+}
+
+function showSessionRulesMessage() {
+  const status = $('analyticsSessionsStatus');
+  status.replaceChildren(document.createTextNode('Firestore rules need the visitor session and event entries. '));
+  const link = document.createElement('a');
+  link.href = 'firestore-analytics-rules.txt';
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = 'Open the updated copy-ready rules';
+  status.append(link);
+}
+
 async function loadDashboardData() {
   dashboardStatus.textContent = 'Loading dashboard data…';
   $('analyticsStatus').textContent = 'Loading activity…';
@@ -214,10 +279,12 @@ async function loadDashboardData() {
     const days = Number($('analyticsRange').value || 30);
     const start = new Date(); start.setUTCHours(0, 0, 0, 0); start.setUTCDate(start.getUTCDate() - days + 1);
     const startDay = dayNumber(start);
-    const [bookings, subscribers, analytics] = await Promise.allSettled([
+    const [bookings, subscribers, analytics, sessions, events] = await Promise.allSettled([
       firestore.getDocs(firestore.query(firestore.collection(db, 'bookings'), firestore.orderBy('createdAt', 'desc'), firestore.limit(100))),
       firestore.getDocs(firestore.query(firestore.collection(db, 'subscribers'), firestore.orderBy('createdAt', 'desc'), firestore.limit(200))),
-      firestore.getDocs(firestore.query(firestore.collection(db, 'siteAnalytics'), firestore.where('day', '>=', startDay), firestore.orderBy('day', 'asc'), firestore.limit(5000)))
+      firestore.getDocs(firestore.query(firestore.collection(db, 'siteAnalytics'), firestore.where('day', '>=', startDay), firestore.orderBy('day', 'asc'), firestore.limit(5000))),
+      firestore.getDocs(firestore.query(firestore.collection(db, 'visitorSessions'), firestore.where('day', '>=', startDay), firestore.orderBy('day', 'desc'), firestore.limit(200))),
+      firestore.getDocs(firestore.query(firestore.collection(db, 'visitorEvents'), firestore.where('day', '>=', startDay), firestore.orderBy('day', 'desc'), firestore.limit(5000)))
     ]);
     if (bookings.status === 'fulfilled') renderBookings(bookings.value.docs.map(doc => doc.data()));
     else { renderBookings([]); $('bookingList').replaceChildren(text('p', 'Firestore rules do not allow reading bookings.', 'empty-note')); }
@@ -237,6 +304,12 @@ async function loadDashboardData() {
       rulesLink.textContent = 'Open the copy-ready rules';
       status.append(rulesLink);
       ['analyticsPages', 'analyticsClicks', 'analyticsDevices', 'analyticsSources', 'analyticsRegions'].forEach(id => $(id).replaceChildren());
+    }
+    if (sessions.status === 'fulfilled' && events.status === 'fulfilled') {
+      renderSessionJourneys(sessions.value.docs, events.value.docs);
+    } else {
+      $('analyticsSessions').replaceChildren();
+      showSessionRulesMessage();
     }
     dashboardStatus.textContent = '';
   } catch (error) {

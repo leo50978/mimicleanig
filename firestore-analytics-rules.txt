@@ -1,14 +1,20 @@
-Paste this block inside `match /databases/{database}/documents { ... }` in Firestore Rules. It keeps aggregate metrics only; reading the aggregate counters is public because the current dashboard has a front-end-only PIN and no Firebase Authentication. Do not use this for names, emails, IP addresses, exact location, or visitor-level records.
+Replace the previously pasted analytics block with this complete version. Paste it inside `match /databases/{database}/documents { ... }` in Firestore Rules. It enables daily aggregate counters and anonymous tab-session journeys. It does not use Cloud Functions or store names, emails, IP addresses, exact locations, full URLs, or form contents.
+
+Analytics reads are public because the static dashboard has no Firebase Authentication or server function; its 1199 screen is not a security boundary. Use these collections only for non-sensitive analytics. Counters and sessions can be altered by public clients, and stored records do not expire automatically.
+
+    function validPageKey(key) {
+      return key in ['home', 'about', 'services', 'testimonials', 'blog', 'miami_house_cleaning', 'fort_lauderdale_office_cleaning', 'move_in_move_out_cleaning', 'yacht_cleaning', 'west_palm_broward_cleaning', 'kosher_friendly_cleaning', 'privacy_policy', 'not_found', 'other_page'];
+    }
 
     function validAnalyticsKey(metric, key) {
       return (metric == 'pageviews' && key == 'all')
         || (metric == 'visits' && key == 'all')
-        || (metric == 'page' && key in ['home', 'about', 'services', 'testimonials', 'blog', 'miami_house_cleaning', 'fort_lauderdale_office_cleaning', 'move_in_move_out_cleaning', 'yacht_cleaning', 'west_palm_broward_cleaning', 'kosher_friendly_cleaning', 'privacy_policy', 'not_found', 'other_page'])
+        || (metric == 'page' && validPageKey(key))
         || (metric == 'device' && key in ['mobile', 'tablet', 'desktop'])
         || (metric == 'source' && key in ['direct', 'internal', 'search', 'facebook', 'instagram', 'yelp', 'nextdoor', 'campaign_other', 'referral_other', 'other'])
         || (metric == 'timezone' && key in ['us_eastern', 'us_central', 'us_mountain', 'us_pacific', 'us_alaska', 'us_hawaii', 'non_us_or_other', 'unknown'])
         || (metric == 'click' && key in ['booking_submit', 'newsletter_submit', 'review_submit', 'social_link', 'phone_call', 'email_link', 'booking_open', 'navigation', 'service_link', 'booking_cta', 'contact_cta', 'review_action', 'menu_toggle', 'other_button', 'other_link'])
-        || (metric == 'engaged_seconds' && key in ['home', 'about', 'services', 'testimonials', 'blog', 'miami_house_cleaning', 'fort_lauderdale_office_cleaning', 'move_in_move_out_cleaning', 'yacht_cleaning', 'west_palm_broward_cleaning', 'kosher_friendly_cleaning', 'privacy_policy', 'not_found', 'other_page']);
+        || (metric == 'engaged_seconds' && validPageKey(key));
     }
 
     function validAnalyticsWrite() {
@@ -24,7 +30,6 @@ Paste this block inside `match /databases/{database}/documents { ... }` in Fires
     }
 
     match /siteAnalytics/{counterId} {
-      // These records contain daily aggregate counters only, not visitor identities.
       allow get, list: if request.query.limit != null && request.query.limit <= 5000;
       allow create: if validAnalyticsWrite()
         && request.resource.data.count >= 1
@@ -37,4 +42,76 @@ Paste this block inside `match /databases/{database}/documents { ... }` in Fires
         && request.resource.data.count <= resource.data.count + 15
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['count', 'updatedAt']);
       allow delete: if false;
+    }
+
+    function validSessionId(sessionId) {
+      return sessionId.matches('^[a-f0-9]{32}$');
+    }
+
+    function validSessionFields(sessionId) {
+      return request.resource.data.keys().hasOnly(['sessionId', 'day', 'device', 'source', 'timezone', 'firstPage', 'startedAt', 'lastActiveAt'])
+        && request.resource.data.keys().hasAll(['sessionId', 'day', 'device', 'source', 'timezone', 'firstPage', 'startedAt', 'lastActiveAt'])
+        && request.resource.data.sessionId == sessionId
+        && validSessionId(sessionId)
+        && request.resource.data.day is int
+        && request.resource.data.day == request.time.year() * 10000 + request.time.month() * 100 + request.time.day()
+        && request.resource.data.device in ['mobile', 'tablet', 'desktop']
+        && request.resource.data.source in ['direct', 'internal', 'search', 'facebook', 'instagram', 'yelp', 'nextdoor', 'campaign_other', 'referral_other', 'other']
+        && request.resource.data.timezone in ['us_eastern', 'us_central', 'us_mountain', 'us_pacific', 'us_alaska', 'us_hawaii', 'non_us_or_other', 'unknown']
+        && validPageKey(request.resource.data.firstPage)
+        && request.resource.data.startedAt is timestamp
+        && request.resource.data.lastActiveAt is timestamp;
+    }
+
+    match /visitorSessions/{sessionId} {
+      allow get, list: if request.query.limit != null && request.query.limit <= 200;
+      allow create: if validSessionFields(sessionId)
+        && request.resource.data.startedAt == request.time
+        && request.resource.data.lastActiveAt == request.time;
+      allow update: if validSessionFields(sessionId)
+        && request.resource.data.sessionId == resource.data.sessionId
+        && request.resource.data.day == resource.data.day
+        && request.resource.data.device == resource.data.device
+        && request.resource.data.source == resource.data.source
+        && request.resource.data.timezone == resource.data.timezone
+        && request.resource.data.firstPage == resource.data.firstPage
+        && request.resource.data.startedAt == resource.data.startedAt
+        && request.resource.data.lastActiveAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastActiveAt']);
+      allow delete: if false;
+    }
+
+    function validVisitorEvent() {
+      return request.resource.data.keys().hasOnly(['day', 'sessionId', 'type', 'page', 'actionKey', 'actionLabel', 'seconds', 'occurredAt'])
+        && request.resource.data.keys().hasAll(['day', 'sessionId', 'type', 'page', 'actionKey', 'actionLabel', 'seconds', 'occurredAt'])
+        && request.resource.data.day is int
+        && request.resource.data.day == request.time.year() * 10000 + request.time.month() * 100 + request.time.day()
+        && request.resource.data.sessionId is string
+        && validSessionId(request.resource.data.sessionId)
+        && request.resource.data.type in ['page', 'click', 'engaged']
+        && validPageKey(request.resource.data.page)
+        && request.resource.data.actionKey is string
+        && request.resource.data.actionLabel is string
+        && request.resource.data.actionLabel.size() <= 80
+        && request.resource.data.seconds is int
+        && request.resource.data.seconds >= 0
+        && request.resource.data.seconds <= 15
+        && request.resource.data.occurredAt == request.time
+        && ((request.resource.data.type == 'page'
+              && request.resource.data.actionKey == ''
+              && request.resource.data.actionLabel == ''
+              && request.resource.data.seconds == 0)
+          || (request.resource.data.type == 'click'
+              && request.resource.data.actionKey in ['booking_submit', 'newsletter_submit', 'review_submit', 'social_link', 'phone_call', 'email_link', 'booking_open', 'navigation', 'service_link', 'booking_cta', 'contact_cta', 'review_action', 'menu_toggle', 'other_button', 'other_link']
+              && request.resource.data.seconds == 0)
+          || (request.resource.data.type == 'engaged'
+              && request.resource.data.actionKey == ''
+              && request.resource.data.actionLabel == ''
+              && request.resource.data.seconds > 0));
+    }
+
+    match /visitorEvents/{eventId} {
+      allow get, list: if request.query.limit != null && request.query.limit <= 5000;
+      allow create: if validVisitorEvent();
+      allow update, delete: if false;
     }
