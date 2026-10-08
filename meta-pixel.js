@@ -2,6 +2,9 @@
   'use strict';
 
   // Meta Pixel base code. Clino uses PageView only; no form or contact events are sent.
+  // Honor Global Privacy Control before creating any request to Meta.
+  if (navigator.globalPrivacyControl === true) return;
+
   (function (f, b, e, v, n, t, s) {
     if (f.fbq) return;
     n = f.fbq = function () {
