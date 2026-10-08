@@ -42,6 +42,10 @@ const timezoneLabels = {
   us_alaska: 'Alaska', us_hawaii: 'Hawaii', non_us_or_other: 'Other / outside US', unknown: 'Unknown'
 };
 const eventTypeLabels = { page: 'Viewed', click: 'Clicked', engaged: 'Active' };
+let bookingRecords = [];
+let subscriberRecords = [];
+let sessionRecords = [];
+let eventRecordsBySession = new Map();
 
 function text(tag, value, className) {
   const node = document.createElement(tag);
@@ -57,32 +61,59 @@ function dateLabel(value) {
 }
 
 function renderBookings(data) {
-  const bookingList = $('bookingList');
-  bookingList.replaceChildren();
+  bookingRecords = data;
   $('bookingCount').textContent = String(data.length);
-  if (!data.length) bookingList.append(text('p', 'No booking requests yet.', 'empty-note'));
-  data.forEach(item => {
-    const card = document.createElement('article');
-    card.className = 'booking-item';
-    const meta = text('div', `${item.date || ''} · ${item.time || ''} · ${dateLabel(item.createdAt)}`, 'booking-meta');
-    const name = text('h3', item.name || 'New request');
-    const email = document.createElement('a');
-    email.href = `mailto:${encodeURIComponent(item.email || '')}`;
-    email.textContent = item.email || 'No email provided';
-    card.append(meta, name, email, text('div', item.plan || 'Cleaning request', 'booking-meta'), text('p', item.message || 'No additional message.'));
-    bookingList.append(card);
+  $('bookingNavCount').textContent = number(data.length);
+  renderBookingRows();
+}
+
+function renderBookingRows() {
+  const list = $('bookingList');
+  const query = $('bookingSearch').value.trim().toLowerCase();
+  const matches = bookingRecords.map((item, index) => ({ item, index })).filter(({item}) =>
+    [item.name, item.email, item.plan, item.date, item.time, item.message].some(value => String(value || '').toLowerCase().includes(query))
+  );
+  list.replaceChildren();
+  if (!matches.length) {
+    list.append(text('p', bookingRecords.length ? 'No requests match your search.' : 'No cleaning requests yet.', 'empty-note'));
+    return;
+  }
+  matches.forEach(({item, index}) => {
+    const row = document.createElement('button');
+    row.type = 'button'; row.className = 'booking-row'; row.dataset.detailKind = 'booking'; row.dataset.detailIndex = String(index);
+    const client = document.createElement('span'); client.className = 'row-primary';
+    client.append(text('strong', item.name || 'New request'), text('small', item.email || 'No email provided'));
+    const service = text('span', item.plan || 'Cleaning request', 'service-badge');
+    const date = text('span', `${item.date || 'Date not set'}${item.time ? ` · ${item.time}` : ''}`, 'row-date');
+    row.append(client, service, date, text('span', '›', 'row-arrow'));
+    list.append(row);
   });
 }
 
 function renderSubscribers(data) {
-  const list = $('subscriberList');
-  list.replaceChildren();
+  subscriberRecords = data;
   $('subscriberCount').textContent = String(data.length);
-  if (!data.length) list.append(text('p', 'No email sign-ups yet.', 'empty-note'));
-  data.forEach(item => {
-    const chip = text('span', item.email || 'No email provided', 'email-chip');
-    chip.title = dateLabel(item.createdAt);
-    list.append(chip);
+  $('subscriberNavCount').textContent = number(data.length);
+  renderSubscriberRows();
+}
+
+function renderSubscriberRows() {
+  const list = $('subscriberList');
+  const query = $('subscriberSearch').value.trim().toLowerCase();
+  const matches = subscriberRecords.map((item, index) => ({ item, index }))
+    .filter(({item}) => String(item.email || '').toLowerCase().includes(query));
+  list.replaceChildren();
+  if (!matches.length) {
+    list.append(text('p', subscriberRecords.length ? 'No subscribers match your search.' : 'No email subscribers yet.', 'empty-note'));
+    return;
+  }
+  matches.forEach(({item, index}) => {
+    const row = document.createElement('button');
+    row.type = 'button'; row.className = 'subscriber-row'; row.dataset.detailKind = 'subscriber'; row.dataset.detailIndex = String(index);
+    const email = document.createElement('span'); email.className = 'row-primary';
+    email.append(text('strong', item.email || 'No email provided'), text('small', 'Clino email updates'));
+    row.append(email, text('span', dateLabel(item.createdAt), 'row-date'), text('span', '›', 'row-arrow'));
+    list.append(row);
   });
 }
 
@@ -208,73 +239,78 @@ function renderAnalytics(documents, sessionDocuments, days) {
 }
 
 function renderSessionJourneys(sessionDocuments, eventDocuments) {
-  const list = $('analyticsSessions');
-  const status = $('analyticsSessionsStatus');
-  list.replaceChildren();
-  const eventMap = new Map();
+  sessionRecords = sessionDocuments.map(item => ({ id: item.id, ...item.data() }))
+    .sort((a, b) => (b.lastActiveAt?.toMillis?.() || 0) - (a.lastActiveAt?.toMillis?.() || 0)).slice(0, 20);
+  eventRecordsBySession = new Map();
   eventDocuments.forEach(item => {
     const data = item.data();
-    const rows = eventMap.get(data.sessionId) || [];
+    const rows = eventRecordsBySession.get(data.sessionId) || [];
     rows.push(data);
-    eventMap.set(data.sessionId, rows);
+    eventRecordsBySession.set(data.sessionId, rows);
   });
-  const sessions = sessionDocuments.map(item => ({ id: item.id, ...item.data() }))
-    .sort((a, b) => (b.lastActiveAt?.toMillis?.() || 0) - (a.lastActiveAt?.toMillis?.() || 0))
-    .slice(0, 20);
-  if (!sessions.length) {
-    list.append(text('p', 'No anonymous visit journeys recorded for this period.', 'analytics-empty'));
-    status.textContent = '';
-    return;
-  }
-  sessions.forEach(session => {
-    const card = document.createElement('article');
-    card.className = 'analytics-session-card';
-    const shortId = String(session.sessionId || session.id).slice(0, 8);
-    const started = dateLabel(session.startedAt);
-    const location = [session.city, session.region, session.country].filter(value => typeof value === 'string' && value.trim()).join(', ');
-    const metadata = [
-      session.ip ? `IP ${session.ip}` : '',
-      location ? `Approx. ${location}` : '',
-      deviceLabels[session.device] || 'Device unknown',
-      sourceLabels[session.source] || 'Source unknown',
-      timezoneLabels[session.timezone] || 'Region unknown',
-      `Started ${started}`
-    ].filter(Boolean).join(' · ');
-    card.append(text('h4', `Visit ${shortId}…`), text('p', metadata, 'analytics-session-meta'));
-    const trail = document.createElement('ol');
-    trail.className = 'analytics-session-trail';
-    const events = (eventMap.get(session.sessionId || session.id) || [])
-      .sort((a, b) => (a.occurredAt?.toMillis?.() || 0) - (b.occurredAt?.toMillis?.() || 0));
-    events.forEach(event => {
-      let detail = '';
-      if (event.type === 'page') detail = `${eventTypeLabels.page} ${pageLabels[event.page] || 'a page'}`;
-      if (event.type === 'click') {
-        const group = clickLabels[event.actionKey] || 'Site action';
-        detail = `${eventTypeLabels.click} ${event.actionLabel || group} · ${group}`;
-      }
-      if (event.type === 'engaged') detail = `${eventTypeLabels.engaged} ${number(event.seconds)}s on ${pageLabels[event.page] || 'a page'}`;
-      if (!detail) return;
-      trail.append(text('li', `${dateLabel(event.occurredAt)} · ${detail}`));
-    });
-    if (!trail.children.length) trail.append(text('li', 'No page or action events were captured.'));
-    card.append(trail);
-    list.append(card);
-  });
-  status.textContent = '';
+  $('visitorNavCount').textContent = number(sessionRecords.length);
+  renderVisitorRows();
+  renderOverviewSessions();
+  $('analyticsSessionsStatus').textContent = '';
 }
 
-function showSessionRulesMessage() {
+function sessionLocation(session) {
+  return [session.city, session.region, session.country].filter(value => typeof value === 'string' && value.trim()).join(', ');
+}
+
+function sessionEvents(session) {
+  return (eventRecordsBySession.get(session.sessionId || session.id) || [])
+    .slice().sort((a, b) => (a.occurredAt?.toMillis?.() || 0) - (b.occurredAt?.toMillis?.() || 0));
+}
+
+function renderVisitorRows() {
+  const list = $('analyticsSessions');
+  const query = $('visitorSearch').value.trim().toLowerCase();
+  list.replaceChildren();
+  const matches = sessionRecords.map((session, index) => ({session,index})).filter(({session}) =>
+    [session.sessionId, session.ip, sessionLocation(session), session.device, session.source, session.page]
+      .some(value => String(value || '').toLowerCase().includes(query))
+  );
+  if (!matches.length) {
+    list.append(text('p', sessionRecords.length ? 'No visits match your search.' : 'No anonymous visit journeys recorded for this period.', 'empty-note'));
+    return;
+  }
+  matches.forEach(({session,index}) => {
+    const row = document.createElement('button'); row.type='button'; row.className='visitor-card';
+    row.dataset.detailKind='visitor'; row.dataset.detailIndex=String(index);
+    const shortId = String(session.sessionId || session.id).slice(0,8);
+    const location = sessionLocation(session);
+    row.append(text('strong', `Visit ${shortId}…`), text('span', `${deviceLabels[session.device] || 'Device unknown'}${location ? ` · ${location}` : ''} · ${dateLabel(session.lastActiveAt || session.startedAt)}`, 'visitor-device'));
+    row.append(text('small', [session.ip ? `IP ${session.ip}` : '', sourceLabels[session.source] || 'Source unknown', `${sessionEvents(session).length} activity events`].filter(Boolean).join(' · ')));
+    list.append(row);
+  });
+}
+
+function renderOverviewSessions() {
+  const list = $('overviewSessions'); list.replaceChildren();
+  if (!sessionRecords.length) { list.append(text('p','No recent visitor activity yet.','overview-empty')); return; }
+  sessionRecords.slice(0,4).forEach((session,index) => {
+    const row=document.createElement('button'); row.type='button'; row.className='overview-session-row';
+    row.dataset.detailKind='visitor'; row.dataset.detailIndex=String(index);
+    const primary=document.createElement('span');
+    primary.append(text('strong',`Visit ${String(session.sessionId || session.id).slice(0,8)}…`),text('small',[sessionLocation(session)||'Location unavailable',dateLabel(session.lastActiveAt || session.startedAt)].join(' · ')));
+    row.append(primary,text('span','Details →')); list.append(row);
+  });
+}
+
+function showSessionErrorMessage() {
   const status = $('analyticsSessionsStatus');
-  status.replaceChildren(document.createTextNode('Firestore rules need the visitor session and event entries. '));
+  status.replaceChildren(document.createTextNode('The visitor timeline could not be loaded. Check the connection, then retry. '));
   const link = document.createElement('a');
-  link.href = 'firestore-analytics-rules.txt';
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  link.textContent = 'Open the updated copy-ready rules';
+  link.href = '#';
+  link.textContent = 'Retry loading';
+  link.addEventListener('click', event => { event.preventDefault(); loadDashboardData(); });
   status.append(link);
 }
 
 async function loadDashboardData() {
+  $('connectionStatus').textContent = 'Loading dashboard data…';
+  $('connectionDot').classList.remove('is-warning');
   dashboardStatus.textContent = 'Loading dashboard data…';
   $('analyticsStatus').textContent = 'Loading activity…';
   try {
@@ -295,43 +331,132 @@ async function loadDashboardData() {
       firestore.getDocs(firestore.query(firestore.collection(db, 'visitorSessions'), firestore.where('day', '>=', startDay), firestore.orderBy('day', 'desc'), firestore.limit(200))),
       firestore.getDocs(firestore.query(firestore.collection(db, 'visitorEvents'), firestore.where('day', '>=', startDay), firestore.orderBy('day', 'desc'), firestore.limit(5000)))
     ]);
+    const fulfilledReads = [bookings, subscribers, analytics, sessions, events].filter(result => result.status === 'fulfilled').length;
+    $('connectionStatus').textContent = fulfilledReads === 5 ? 'Connected to Firestore' : fulfilledReads ? 'Some data unavailable' : 'Connection issue';
+    $('connectionDot').classList.toggle('is-warning', fulfilledReads < 5);
     if (bookings.status === 'fulfilled') renderBookings(bookings.value.docs.map(doc => doc.data()));
-    else { renderBookings([]); $('bookingList').replaceChildren(text('p', 'Firestore rules do not allow reading bookings.', 'empty-note')); }
+    else { renderBookings([]); $('bookingList').replaceChildren(text('p', 'Could not load booking requests right now.', 'empty-note')); }
     if (subscribers.status === 'fulfilled') renderSubscribers(subscribers.value.docs.map(doc => doc.data()));
-    else { renderSubscribers([]); $('subscriberList').replaceChildren(text('p', 'Firestore rules do not allow reading email sign-ups.', 'empty-note')); }
+    else { renderSubscribers([]); $('subscriberList').replaceChildren(text('p', 'Could not load subscribers right now.', 'empty-note')); }
     if (analytics.status === 'fulfilled') {
       renderAnalytics(analytics.value.docs, sessions.status === 'fulfilled' ? sessions.value.docs : [], days);
       $('analyticsStatus').textContent = analytics.value.empty ? 'No activity yet for this period.' : '';
     } else {
       $('analyticsKpis').replaceChildren(); $('analyticsChart').replaceChildren();
       const status = $('analyticsStatus');
-      status.replaceChildren(document.createTextNode('Firestore is blocking analytics reads. Paste the analytics rules block into Firestore Rules, then reload this dashboard. '));
-      const rulesLink = document.createElement('a');
-      rulesLink.href = 'firestore-analytics-rules.txt';
-      rulesLink.target = '_blank';
-      rulesLink.rel = 'noopener noreferrer';
-      rulesLink.textContent = 'Open the copy-ready rules';
-      status.append(rulesLink);
+      status.replaceChildren(document.createTextNode('Website activity could not be loaded from Firestore. Check your connection, then retry. '));
+      const retryLink = document.createElement('a');
+      retryLink.href = '#';
+      retryLink.textContent = 'Retry loading';
+      retryLink.addEventListener('click', event => { event.preventDefault(); loadDashboardData(); });
+      status.append(retryLink);
       ['analyticsPages', 'analyticsClicks', 'analyticsDevices', 'analyticsSources', 'analyticsLocations', 'analyticsRegions'].forEach(id => $(id).replaceChildren());
     }
     if (sessions.status === 'fulfilled' && events.status === 'fulfilled') {
       renderSessionJourneys(sessions.value.docs, events.value.docs);
     } else {
       $('analyticsSessions').replaceChildren();
-      showSessionRulesMessage();
+      showSessionErrorMessage();
     }
     dashboardStatus.textContent = '';
   } catch (error) {
     console.error('Clino dashboard could not load Firestore data.', error);
-    dashboardStatus.textContent = 'Could not connect to Firestore. Check the project connection and reload.';
+    $('connectionStatus').textContent = 'Connection issue';
+    $('connectionDot').classList.add('is-warning');
+    dashboardStatus.textContent = 'Could not connect to Firestore. Check the connection and try again.';
   }
 }
 
 function showDashboard() {
   loginPanel.hidden = true;
   dashboard.hidden = false;
+  $('adminLogout').hidden = false;
   loadDashboardData();
 }
+
+function setDashboardView(view) {
+  document.querySelectorAll('[data-view-panel]').forEach(panel => {
+    const active = panel.dataset.viewPanel === view;
+    panel.hidden = !active;
+    panel.classList.toggle('is-visible', active);
+  });
+  document.querySelectorAll('[data-dashboard-view]').forEach(button => {
+    const active = button.dataset.dashboardView === view;
+    button.classList.toggle('is-active', active);
+    if (button.getAttribute('role') === 'tab') button.setAttribute('aria-selected', String(active));
+    else if (active) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
+  });
+}
+
+function addDetail(label, value, options = {}) {
+  if (value === undefined || value === null || value === '') return;
+  const row=document.createElement('dl'); row.className='detail-field';
+  const term=text('dt',label); const detail=document.createElement('dd');
+  if (options.email) { const link=document.createElement('a'); link.href=`mailto:${encodeURIComponent(String(value))}`; link.textContent=String(value); detail.append(link); }
+  else detail.textContent=String(value);
+  row.append(term,detail); $('detailsContent').append(row);
+}
+
+function addDialogAction(label, href) {
+  const link=document.createElement('a'); link.className='button'; link.href=href; link.textContent=label; $('detailsActions').append(link);
+}
+
+function openDetails(kind, index) {
+  const dialog=$('detailsDialog'); const content=$('detailsContent'); const actions=$('detailsActions');
+  content.replaceChildren(); actions.replaceChildren();
+  if (kind === 'booking') {
+    const item=bookingRecords[index]; if (!item) return;
+    $('detailsEyebrow').textContent='CLEANING REQUEST'; $('detailsTitle').textContent=item.name || 'New request';
+    addDetail('Client',item.name || 'Not provided'); addDetail('Email',item.email,{email:true});
+    addDetail('Service',item.plan || 'Cleaning request'); addDetail('Preferred date',item.date || 'Not provided');
+    addDetail('Preferred time',item.time || 'Not provided'); addDetail('Received',dateLabel(item.createdAt));
+    addDetail('Message',item.message || 'No additional message.');
+    if (item.email) addDialogAction('Reply by email',`mailto:${encodeURIComponent(item.email)}?subject=${encodeURIComponent('Your Clino cleaning request')}`);
+  } else if (kind === 'subscriber') {
+    const item=subscriberRecords[index]; if (!item) return;
+    $('detailsEyebrow').textContent='EMAIL SUBSCRIBER'; $('detailsTitle').textContent='Sign-up details';
+    addDetail('Email',item.email,{email:true}); addDetail('Joined',dateLabel(item.createdAt));
+    if (item.email) addDialogAction('Compose email',`mailto:${encodeURIComponent(item.email)}`);
+  } else if (kind === 'visitor') {
+    const session=sessionRecords[index]; if (!session) return;
+    $('detailsEyebrow').textContent='ANONYMOUS VISIT'; $('detailsTitle').textContent=`Visit ${String(session.sessionId || session.id).slice(0,8)}…`;
+    addDetail('IP address',session.ip || 'Unavailable'); addDetail('Approx. location',sessionLocation(session) || 'Unavailable');
+    addDetail('Device',deviceLabels[session.device] || 'Unknown'); addDetail('Traffic source',sourceLabels[session.source] || 'Unknown');
+    addDetail('Timezone',timezoneLabels[session.timezone] || 'Unknown'); addDetail('Started',dateLabel(session.startedAt));
+    addDetail('Last active',dateLabel(session.lastActiveAt));
+    const events=sessionEvents(session);
+    if (events.length) {
+      const row=document.createElement('dl'); row.className='detail-field'; row.append(text('dt','Visit activity'));
+      const trail=document.createElement('dd'); const ordered=document.createElement('ol'); ordered.className='dialog-trail';
+      events.forEach(event=>{
+        let detail='';
+        if (event.type==='page') detail=`Viewed ${pageLabels[event.page] || 'a page'}`;
+        if (event.type==='click') detail=`Clicked ${event.actionLabel || clickLabels[event.actionKey] || 'a site action'}`;
+        if (event.type==='engaged') detail=`Active ${number(event.seconds)}s on ${pageLabels[event.page] || 'a page'}`;
+        if (detail) ordered.append(text('li',`${dateLabel(event.occurredAt)} · ${detail}`));
+      });
+      if (!ordered.children.length) ordered.append(text('li','No page or action events were captured.'));
+      trail.append(ordered); row.append(trail); content.append(row);
+    }
+  }
+  if (!dialog.open) dialog.showModal();
+}
+
+document.querySelectorAll('[data-dashboard-view]').forEach(button => button.addEventListener('click', () => setDashboardView(button.dataset.dashboardView)));
+document.querySelectorAll('[data-open-view]').forEach(button => button.addEventListener('click', () => setDashboardView(button.dataset.openView)));
+$('bookingSearch').addEventListener('input',renderBookingRows);
+$('subscriberSearch').addEventListener('input',renderSubscriberRows);
+$('visitorSearch').addEventListener('input',renderVisitorRows);
+document.addEventListener('click',event=>{
+  const trigger=event.target.closest('[data-detail-kind]');
+  if (trigger) openDetails(trigger.dataset.detailKind,Number(trigger.dataset.detailIndex));
+});
+document.querySelector('[data-dialog-close]').addEventListener('click',()=> $('detailsDialog').close());
+$('detailsDialog').addEventListener('click',event=>{if(event.target === $('detailsDialog')) $('detailsDialog').close();});
+$('refreshDashboard').addEventListener('click',loadDashboardData);
+$('dashboardToday').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+setDashboardView('overview');
 
 loginForm.addEventListener('submit', event => {
   event.preventDefault();
@@ -349,6 +474,7 @@ loginForm.addEventListener('submit', event => {
 $('analyticsRange').addEventListener('change', loadDashboardData);
 $('adminLogout').addEventListener('click', () => {
   sessionStorage.removeItem(sessionKey);
+  $('adminLogout').hidden = true;
   dashboard.hidden = true;
   loginPanel.hidden = false;
   loginForm.reset();

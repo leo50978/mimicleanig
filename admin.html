@@ -7,35 +7,70 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="pages.css"><link rel="stylesheet" href="admin.css">
   <script src="admin.js" defer></script>
-<meta name="robots" content="noindex,nofollow"/><meta name="robots" content="noindex,nofollow"/><meta name="robots" content="noindex,nofollow"/><meta name="robots" content="noindex,nofollow"/></head>
+</head>
 <body class="admin-page">
-  <header class="admin-top"><a class="brand" href="index.html" aria-label="Back to Clino"><svg class="brand-icon" viewBox="0 0 28 32" fill="none" aria-hidden="true"><path d="M10 2.5a1.7 1.7 0 1 1 0 3.4 1.7 1.7 0 0 1 0-3.4ZM18 5.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" fill="currentColor"/><path d="M4.5 9h18v18.2c0 1.1-.9 2-2 2h-14c-1.1 0-2-.9-2-2V9Z" fill="currentColor"/><path d="M9 14.5v5.2M18 14.5v5.2M8 23c3.6 2.4 7.4 2.4 11 0" stroke="#211c37" stroke-width="1.6" stroke-linecap="round"/></svg><span>Clino</span></a><a href="index.html" class="back-link">← Back to website</a></header>
+  <header class="admin-top">
+    <a class="brand" href="index.html" aria-label="Back to Clino">
+      <svg class="brand-icon" viewBox="0 0 28 32" fill="none" aria-hidden="true"><path d="M10 2.5a1.7 1.7 0 1 1 0 3.4 1.7 1.7 0 0 1 0-3.4ZM18 5.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" fill="currentColor"/><path d="M4.5 9h18v18.2c0 1.1-.9 2-2 2h-14c-1.1 0-2-.9-2-2V9Z" fill="currentColor"/><path d="M9 14.5v5.2M18 14.5v5.2M8 23c3.6 2.4 7.4 2.4 11 0" stroke="#211c37" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>Clino</span><span class="brand-workspace">STUDIO</span>
+    </a>
+    <div class="top-actions"><a href="index.html" class="back-link" aria-label="View website"><span class="back-label">View website</span> <span aria-hidden="true">↗</span></a><button class="button outline" id="adminLogout" type="button" hidden>Sign out</button></div>
+  </header>
   <main class="admin-main wrap">
     <section class="admin-panel glass-card" id="loginPanel" aria-labelledby="adminTitle">
-      <span class="eyebrow">Dashboard access</span><h1 id="adminTitle">Clino dashboard</h1><p>Enter your access code to view booking requests and email sign-ups. The code only hides this screen; analytics data is publicly readable in Firestore.</p>
-      <form id="adminLogin"><label for="adminCode">Access code</label><div class="code-row"><input id="adminCode" name="code" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="one-time-code" required aria-describedby="adminStatus"><button class="button" type="submit">Continue</button></div></form>
+      <span class="eyebrow">PRIVATE WORKSPACE</span><h1 id="adminTitle">Welcome back.</h1><p>Enter your access code to view Clino requests, subscribers and website activity.</p>
+      <form id="adminLogin"><label for="adminCode">Access code</label><div class="code-row"><input id="adminCode" name="code" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="one-time-code" required aria-describedby="adminStatus"><button class="button" type="submit">Continue <span aria-hidden="true">→</span></button></div></form>
       <p class="admin-status" id="adminStatus" role="status" aria-live="polite"></p>
+      <p class="login-footnote">This code opens the dashboard view on this device.</p>
     </section>
     <section class="dashboard" id="dashboard" hidden>
-      <div class="dashboard-head"><div><span class="eyebrow">Site overview</span><h1>Site analytics</h1><p>Daily totals and visit journeys, stored directly in Firestore.</p></div><button class="button outline" id="adminLogout" type="button">Sign out</button></div>
-      <section class="data-panel glass-card analytics-panel" aria-labelledby="analyticsTitle">
-        <div class="analytics-heading"><div><h2 id="analyticsTitle">Website activity</h2><p>Counts are aggregated by day; they do not identify individual people.</p></div><label class="analytics-range-label" for="analyticsRange">Period<select id="analyticsRange"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option></select></label></div>
-        <p class="admin-status analytics-status" id="analyticsStatus" role="status" aria-live="polite"></p>
-        <div class="analytics-kpis" id="analyticsKpis"></div>
-        <div class="analytics-chart-card"><h3>Daily activity</h3><div class="chart-legend"><span><i class="legend-pageviews"></i>Page views</span><span><i class="legend-visits"></i>Visits</span><span><i class="legend-clicks"></i>Button clicks</span></div><svg id="analyticsChart" class="analytics-chart" viewBox="0 0 900 250" role="img" aria-label="Daily page views, visits and button clicks for the selected period"></svg></div>
-        <div class="analytics-sessions-card"><div><h3>Recent visit journeys</h3><p>Temporary browser-tab ID, IP address and approximate IP location when available. An IP identifies a network, not necessarily a person.</p></div><p class="admin-status analytics-status" id="analyticsSessionsStatus" role="status" aria-live="polite"></p><div id="analyticsSessions" class="analytics-sessions-list"></div></div>
-        <div class="analytics-breakdowns">
-          <article><h3>Most visited pages</h3><ol id="analyticsPages"></ol></article>
-          <article><h3>Button actions</h3><ol id="analyticsClicks"></ol></article>
-          <article><h3>Devices &amp; traffic</h3><ol id="analyticsDevices"></ol><h4 class="analytics-subheading">Traffic sources</h4><ol id="analyticsSources"></ol></article>
-          <article><h3>IP locations (up to 200 sessions)</h3><ol id="analyticsLocations"></ol><h4 class="analytics-subheading">Browser timezone</h4><ol id="analyticsRegions"></ol><p class="analytics-note">City, region and country are estimates from IP geolocation; counts use up to 200 session records for the selected period, and locations do not identify an exact address. Timezone is a separate broad browser setting.</p></article>
+      <aside class="dashboard-sidebar" aria-label="Dashboard navigation">
+        <span class="sidebar-label">WORKSPACE</span>
+        <button class="nav-item is-active" type="button" data-dashboard-view="overview" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></span>Overview</button>
+        <button class="nav-item" type="button" data-dashboard-view="visitors"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.4-3.2 3.2-5.3 7-5.3s6.6 2.1 7 5.3" stroke-linecap="round"/></svg></span>Visitors<span class="nav-count" id="visitorNavCount">0</span></button>
+        <button class="nav-item" type="button" data-dashboard-view="bookings"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 8h6M9 12h6M9 16h4" stroke-linecap="round"/></svg></span>Requests<span class="nav-count" id="bookingNavCount">0</span></button>
+        <button class="nav-item" type="button" data-dashboard-view="subscribers"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m5 7 7 5.5L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Subscribers<span class="nav-count" id="subscriberNavCount">0</span></button>
+        <div class="sidebar-bottom"><span class="live-dot" id="connectionDot"></span><span id="connectionStatus">Waiting for data</span></div>
+      </aside>
+      <div class="dashboard-content">
+        <div class="mobile-view-nav" role="tablist" aria-label="Dashboard sections">
+          <button class="is-active" type="button" data-dashboard-view="overview" role="tab" aria-selected="true">Overview</button>
+          <button type="button" data-dashboard-view="visitors" role="tab" aria-selected="false">Visitors</button>
+          <button type="button" data-dashboard-view="bookings" role="tab" aria-selected="false">Requests</button>
+          <button type="button" data-dashboard-view="subscribers" role="tab" aria-selected="false">Subscribers</button>
         </div>
-        <p class="analytics-note">A visit is a temporary browser-tab session, not a verified person. The session timeline stores an IP address, approximate city/region/country, device and source categories, page names, button labels/categories and visible time. No name, email, exact street address, full URL or form contents are stored. GPC-enabled browsers are not tracked. Analytics counters, IP addresses and session events are publicly readable because this static dashboard has no Firebase Authentication or server function. Records remain until manually deleted.</p>
-      </section>
-      <section class="data-panel glass-card"><h2>Booking messages <span id="bookingCount">0</span></h2><div id="bookingList" class="data-list"></div></section>
-      <section class="data-panel glass-card"><h2>Email sign-ups <span id="subscriberCount">0</span></h2><div id="subscriberList" class="email-list"></div></section>
-      <p class="admin-status" id="dashboardStatus" role="status" aria-live="polite"></p>
+        <div class="dashboard-toolbar"><div class="toolbar-context"><span class="eyebrow">CLINO · WORKSPACE</span><span id="dashboardToday"></span></div><div class="toolbar-actions"><button class="icon-button" id="refreshDashboard" type="button" aria-label="Refresh dashboard" title="Refresh data">↻</button><label class="analytics-range-label" for="analyticsRange"><span>Reporting period</span><select id="analyticsRange"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option></select></label></div></div>
+        <p class="admin-status dashboard-status" id="dashboardStatus" role="status" aria-live="polite"></p>
+        <section class="dashboard-view is-visible" id="view-overview" data-view-panel="overview" aria-labelledby="viewTitle-overview">
+          <div class="page-heading"><div><h1 id="viewTitle-overview">Your business at a glance</h1><p>Recent activity and the signals that matter, all in one place.</p></div></div>
+          <p class="admin-status analytics-status" id="analyticsStatus" role="status" aria-live="polite"></p>
+          <div class="analytics-kpis" id="analyticsKpis"></div>
+          <div class="overview-grid">
+            <article class="surface-card trend-card"><div class="card-heading"><div><h2>Website activity</h2><p>Daily visits, page views and actions</p></div><span class="subtle-icon">↗</span></div><div class="chart-legend"><span><i class="legend-pageviews"></i>Page views</span><span><i class="legend-visits"></i>Visits</span><span><i class="legend-clicks"></i>Actions</span></div><svg id="analyticsChart" class="analytics-chart" viewBox="0 0 900 250" role="img" aria-label="Daily page views, visits and button clicks for the selected period"></svg></article>
+            <article class="surface-card"><div class="card-heading"><div><h2>Most visited pages</h2><p>What visitors are exploring</p></div><button class="text-button" type="button" data-open-view="visitors">Details <span aria-hidden="true">→</span></button></div><ol id="analyticsPages" class="rank-list"></ol></article>
+            <article class="surface-card"><div class="card-heading"><div><h2>Popular actions</h2><p>How visitors get in touch</p></div><button class="text-button" type="button" data-open-view="visitors">Details <span aria-hidden="true">→</span></button></div><ol id="analyticsClicks" class="rank-list"></ol></article>
+            <article class="surface-card recent-card"><div class="card-heading"><div><h2>Recent visit journeys</h2><p>Anonymous sessions and page activity</p></div><button class="text-button" type="button" data-open-view="visitors">See all <span aria-hidden="true">→</span></button></div><div id="overviewSessions" class="overview-session-list"></div></article>
+          </div>
+          <p class="privacy-footnote">Activity is reported as anonymous browser-tab sessions and aggregated counts, not verified individual people.</p>
+        </section>
+        <section class="dashboard-view" id="view-visitors" data-view-panel="visitors" aria-labelledby="viewTitle-visitors" hidden>
+          <div class="page-heading"><div><h1 id="viewTitle-visitors">Visitor activity</h1><p>Explore anonymous visit journeys and traffic patterns.</p></div></div>
+          <div class="visitor-summary-grid"><article class="surface-card"><h2>Devices</h2><ol id="analyticsDevices" class="rank-list"></ol></article><article class="surface-card"><h2>Traffic sources</h2><ol id="analyticsSources" class="rank-list"></ol></article><article class="surface-card"><h2>Approximate locations</h2><ol id="analyticsLocations" class="rank-list"></ol><p class="card-footnote">Location estimates may be imprecise and do not identify an exact address.</p></article><article class="surface-card"><h2>Browser timezones</h2><ol id="analyticsRegions" class="rank-list"></ol><p class="card-footnote">Timezone is a broad browser setting, not a verified physical location.</p></article></div>
+          <article class="surface-card list-card"><div class="card-heading list-heading"><div><h2>Recent visit journeys</h2><p>Up to 20 recent sessions in the selected period</p></div><label class="search-field"><span class="sr-only">Search visitors</span><span aria-hidden="true">⌕</span><input id="visitorSearch" type="search" placeholder="Search visits" autocomplete="off"></label></div><p class="admin-status analytics-status" id="analyticsSessionsStatus" role="status" aria-live="polite"></p><div id="analyticsSessions" class="visitor-list"></div></article>
+          <p class="privacy-footnote">Visitor records include a temporary tab ID, IP address and approximate location where available, device/source categories, page names, actions and visible time. No form contents are stored. These records are publicly readable in Firestore.</p>
+        </section>
+        <section class="dashboard-view" id="view-bookings" data-view-panel="bookings" aria-labelledby="viewTitle-bookings" hidden>
+          <div class="page-heading"><div><h1 id="viewTitle-bookings">Cleaning requests</h1><p>Review new inquiries and follow up with the client.</p></div><span class="total-pill"><strong id="bookingCount">0</strong> requests</span></div>
+          <article class="surface-card list-card"><div class="card-heading list-heading"><div><h2>All requests</h2><p>Most recent requests appear first</p></div><label class="search-field"><span class="sr-only">Search requests</span><span aria-hidden="true">⌕</span><input id="bookingSearch" type="search" placeholder="Search name, email or service" autocomplete="off"></label></div><div class="list-column-labels booking-columns"><span>CLIENT</span><span>SERVICE</span><span>PREFERRED DATE</span><span></span></div><div id="bookingList" class="booking-table"></div></article>
+        </section>
+        <section class="dashboard-view" id="view-subscribers" data-view-panel="subscribers" aria-labelledby="viewTitle-subscribers" hidden>
+          <div class="page-heading"><div><h1 id="viewTitle-subscribers">Email subscribers</h1><p>People who signed up for occasional Clino updates.</p></div><span class="total-pill"><strong id="subscriberCount">0</strong> subscribers</span></div>
+          <article class="surface-card list-card"><div class="card-heading list-heading"><div><h2>Subscriber list</h2><p>Tap a row to view its sign-up details</p></div><label class="search-field"><span class="sr-only">Search subscribers</span><span aria-hidden="true">⌕</span><input id="subscriberSearch" type="search" placeholder="Search email address" autocomplete="off"></label></div><div class="list-column-labels subscriber-columns"><span>EMAIL ADDRESS</span><span>JOINED</span><span></span></div><div id="subscriberList" class="subscriber-table"></div></article>
+        </section>
+      </div>
     </section>
   </main>
+  <dialog class="details-dialog" id="detailsDialog" aria-labelledby="detailsTitle"><div class="dialog-top"><div><span class="eyebrow" id="detailsEyebrow">DETAILS</span><h2 id="detailsTitle">Details</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close details">×</button></div><div id="detailsContent" class="dialog-content"></div><div class="dialog-actions" id="detailsActions"></div></dialog>
+
 </body>
 </html>
