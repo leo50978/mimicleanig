@@ -39,7 +39,8 @@ form?.addEventListener('submit', async event => {
   try {
     const { db, addDoc, collection, serverTimestamp: _serverTimestamp } = await getFirestoreTools();
     booking.createdAt = _serverTimestamp();
-    await addDoc(collection(db, 'bookings'), booking);
+    const savedRequest = await addDoc(collection(db, 'bookings'), booking);
+    window.clinoMetaEvents?.lead({ submissionId: savedRequest.id, service: booking.plan });
     status.textContent = 'Thanks! Your request is booked. Our team will follow up by email.';
     form.reset();
     if (dateInput) dateInput.min = localToday();

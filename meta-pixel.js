@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  // Meta Pixel base code. Clino uses PageView only; no form or contact events are sent.
+  // Meta Pixel base code. Conversion events are centralized in meta-events.js.
   // Honor Global Privacy Control before creating any request to Meta.
   if (navigator.globalPrivacyControl === true) return;
 
