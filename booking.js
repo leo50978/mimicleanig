@@ -32,7 +32,11 @@ form?.addEventListener('submit', async event => {
     date: String(values.get('date')),
     time: String(values.get('time')),
     plan: String(values.get('plan')),
-    message: String(values.get('message') || '').trim().slice(0, 1200),
+    message: [
+      values.get('phone') ? `Phone: ${String(values.get('phone')).trim()}` : '',
+      values.get('location') ? `City / ZIP: ${String(values.get('location')).trim()}` : '',
+      String(values.get('message') || '').trim()
+    ].filter(Boolean).join('\n').slice(0, 1200),
   };
   if (submit) { submit.disabled = true; submit.textContent = 'Sending request…'; }
   status.textContent = 'Saving your request securely…';
@@ -41,14 +45,14 @@ form?.addEventListener('submit', async event => {
     booking.createdAt = _serverTimestamp();
     const savedRequest = await addDoc(collection(db, 'bookings'), booking);
     window.clinoMetaEvents?.lead({ submissionId: savedRequest.id, service: booking.plan });
-    status.textContent = 'Thanks! Your request is booked. Our team will follow up by email.';
+    status.textContent = 'Thanks — your quote request was received. We’ll contact you to confirm availability and next steps. No appointment is confirmed yet.';
     form.reset();
     if (dateInput) dateInput.min = localToday();
   } catch (error) {
     console.error('Clino booking could not be saved.', error);
     status.textContent = 'We couldn’t save your request right now. Please call +1 (561) 275-4445 and we’ll help.';
   } finally {
-    if (submit) { submit.disabled = false; submit.textContent = 'Request this booking'; }
+    if (submit) { submit.disabled = false; submit.textContent = submit.dataset.idleLabel || 'Request a free quote'; }
   }
 });
 

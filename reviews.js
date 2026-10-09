@@ -3,30 +3,11 @@ import { getFirestoreTools } from './firebase-client.js';
 const form = document.getElementById('reviewForm');
 const grid = document.getElementById('testimonialList');
 const status = document.getElementById('reviewFormStatus');
-const average = document.getElementById('averageRating');
-const heroAverage = document.getElementById('heroAverageRating');
-const heroAggregate = document.querySelector('.rating-aggregate');
 const submit = form?.querySelector('[type="submit"]');
-if (!form || !grid || !status || !average) throw new Error('Review UI is incomplete.');
-
-const staticCards = [...grid.querySelectorAll('.testimonial-card .rating[data-rating]')];
-const staticRatings = staticCards.map(node => Number(node.dataset.rating)).filter(rating => Number.isInteger(rating) && rating >= 1 && rating <= 5);
+if (!form || !grid || !status) throw new Error('Review UI is incomplete.');
 const isValidReview = review => review && typeof review.name === 'string' && review.name.trim().length >= 2
   && typeof review.message === 'string' && review.message.trim().length >= 12
   && Number.isInteger(Number(review.rating)) && Number(review.rating) >= 1 && Number(review.rating) <= 5;
-
-function updateAverage(reviews) {
-  const ratings = [...staticRatings, ...reviews.map(review => Number(review.rating))];
-  if (!ratings.length) return;
-  const value = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
-  const displayed = value.toFixed(1);
-  average.textContent = displayed;
-  if (heroAverage) heroAverage.textContent = `${displayed} / 5`;
-  if (heroAggregate) {
-    heroAggregate.style.setProperty('--rating-fill', `${Math.max(0, Math.min(100, value / 5 * 100))}%`);
-    heroAggregate.setAttribute('aria-label', `Average client rating: ${displayed} out of 5 stars`);
-  }
-}
 
 function formatDate(value) {
   const date = new Date(value);
@@ -61,11 +42,17 @@ function createReviewCard(data) {
 }
 
 function renderReviews(reviews) {
-  grid.querySelectorAll('.user-review').forEach(card => card.remove());
+  grid.querySelectorAll('.user-review, .empty-review').forEach(card => card.remove());
+  if (!reviews.length) {
+    const empty = document.createElement('p');
+    empty.className = 'testimonial-card glass empty-review';
+    empty.textContent = 'No reviews have been shared yet. You can be the first to share your experience.';
+    grid.append(empty);
+    return;
+  }
   const fragment = document.createDocumentFragment();
   reviews.forEach(review => fragment.append(createReviewCard(review)));
   grid.prepend(fragment);
-  updateAverage(reviews);
 }
 
 function mapSnapshotReview(documentSnapshot) {
